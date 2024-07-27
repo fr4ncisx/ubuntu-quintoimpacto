@@ -1,0 +1,36 @@
+package com.ubuntu.ubuntu_app.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
+import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
+import com.ubuntu.ubuntu_app.model.CategoryEntity;
+import com.ubuntu.ubuntu_app.model.dto.CategoryDTO;
+
+@Service
+public class CategoryService {
+
+    @Autowired
+    private CategoryRepository repository;
+
+
+    public ResponseEntity<?> createCategory(CategoryDTO categoryDTO) {
+        repository.save(new CategoryEntity(null,categoryDTO.getNombre())); 
+        var jsonResponse = ResponseMap.createResponse("Categoría creada exitosamente");      
+        return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<?> getAllCategories() {
+        var categoryList = repository.findAll();
+        if (!categoryList.isEmpty()) {
+            var categoryDTO = categoryList.stream().map(c -> MapperConverter.generate().map(c, CategoryDTO.class)).toList();
+            return new ResponseEntity<>(categoryDTO, HttpStatus.ACCEPTED);
+        } else {
+            throw new SQLemptyDataException("No se encontraron categorías en la base de datos");
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "cors.ip.address",
+    "type": "String",
+    "description": "ip address to join frontend with backend"
+  },
+  {
+    "name": "jwt.secret.key",
+    "type": "String",
+    "description": "jwt secret key"
+  },
+  {
+    "name": "cloudinary.url-config",
+    "type": "String",
+    "description": "url de configuracion de Cloudinary necesita tres parámetros, 'public api key' : 'secret api key' @ 'cloudname'"
+  }
+]}
