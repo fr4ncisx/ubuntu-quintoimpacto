@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
@@ -55,11 +56,11 @@ public class JWTUtils {
     }
 
     private Instant getCurrentTime(){
-        return LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
     }
 
     private Instant expirationTime(int hours){
-        return LocalDateTime.now().plusHours(hours).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusHours(hours).atZone(ZoneId.systemDefault()).toInstant();
     }
 
     public String validateTokenLocal(String token) {
