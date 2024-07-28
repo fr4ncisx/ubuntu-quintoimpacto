@@ -58,8 +58,8 @@ public class JWTUtils {
         return LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
     }
 
-    private Instant expirationTime(int Hours){
-        return LocalDateTime.now().plusHours(72).toInstant(ZoneOffset.of("-03:00"));
+    private Instant expirationTime(int hours){
+        return LocalDateTime.now().plusHours(hours).toInstant(ZoneOffset.of("-03:00"));
     }
 
     public String validateTokenLocal(String token) {
