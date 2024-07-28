@@ -40,7 +40,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 email = payload.getEmail();
                 UserEntity userObtained = jwtUtils.userFinder(email);
                 if (userObtained != null) {
-                    String newToken = jwtUtils.generateToken(userObtained);
+                    String newToken = jwtUtils.generateToken(userObtained, payload);
                     response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + newToken);
                     response.setHeader(HEADER_REGISTRATION, "Not required");
                 } else {

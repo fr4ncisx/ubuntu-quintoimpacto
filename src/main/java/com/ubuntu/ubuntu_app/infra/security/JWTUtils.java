@@ -36,7 +36,7 @@ public class JWTUtils {
     @Value("${jwt.secret.key}")
     private String secret;
 
-    public String generateToken(UserEntity user) {
+    public String generateToken(UserEntity user, Payload payload) {
         return JWT.create()
                 .withIssuer("Ubuntu Application")
                 .withSubject(user.getEmail())
@@ -44,6 +44,7 @@ public class JWTUtils {
                 .withClaim("apellido", user.getApellido())
                 .withClaim("telefono", user.getTelefono())
                 .withClaim("rol", user.getRol().name())
+                .withClaim("imagen", payload.get("picture").toString())
                 .withIssuedAt(getCurrentTime())
                 .withExpiresAt(expirationTime(1))
                 .withJWTId(UUID.randomUUID().toString())
@@ -86,7 +87,7 @@ public class JWTUtils {
         }
         UserEntity userEntity = new UserEntity(newLocalUser);
         userRepository.save(userEntity);
-        return generateToken(userEntity);
+        return generateToken(userEntity, payload);
     }
     
     public Payload extractGooglePayload(String googleToken) {
