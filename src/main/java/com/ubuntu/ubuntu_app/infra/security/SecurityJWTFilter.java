@@ -21,6 +21,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
     private static final String PREFIX_TOKEN = "Bearer ";
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String HEADER_STATUS = "Status";
+    private static final String HEADER_LOGIN = "Login";
     private static final String HEADER_REGISTRATION = "Registration";
 
     @Autowired
@@ -52,7 +53,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             } else {
                 email = jwtUtils.validateTokenLocal(token);
                 if (email != null) {
-                    response.setHeader(HEADER_STATUS, "Login validation success");
+                    response.setHeader(HEADER_LOGIN, "Login validation success");
                 } else {
                     response.setHeader(HEADER_STATUS, "Token expired/invalid algorithm");
                 }
