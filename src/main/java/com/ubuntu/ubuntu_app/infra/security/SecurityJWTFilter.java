@@ -53,8 +53,9 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             } else {
                 email = jwtUtils.validateTokenLocal(token);
                 if (email != null) {
-                    response.setHeader(HEADER_LOGIN, "Login validation success");
+                    response.setHeader(HEADER_LOGIN, "Token is valid");
                 } else {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setHeader(HEADER_STATUS, "Token expired/invalid algorithm");
                 }
             }
@@ -71,7 +72,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 return;
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.setHeader(HEADER_STATUS, "Invalid token");
+                response.setHeader(HEADER_STATUS, "Failed token valid but not in database");
                 return;
             }
         }
