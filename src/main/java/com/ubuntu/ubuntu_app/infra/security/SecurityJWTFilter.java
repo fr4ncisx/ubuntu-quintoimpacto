@@ -7,6 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.AlgorithmMismatchException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.ubuntu.ubuntu_app.model.UserEntity;
 
@@ -51,12 +54,17 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                     }
                 }
             } else {
-                email = jwtUtils.validateTokenLocal(token);
-                if (email != null) {
-                    response.setHeader(HEADER_LOGIN, "Token is valid");
-                } else {
+                try {
+                    email = jwtUtils.validateTokenLocal(token);
+                } catch (TokenExpiredException e) {
+                    response.setHeader(HEADER_LOGIN, "Token is expired");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setHeader(HEADER_STATUS, "Token expired/invalid algorithm");
+                } catch (SignatureVerificationException ex) {
+                    response.setHeader(HEADER_LOGIN, "Invalid signature");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                } catch (AlgorithmMismatchException x) {
+                    response.setHeader(HEADER_LOGIN, "Invalid algorithm");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 }
             }
         }

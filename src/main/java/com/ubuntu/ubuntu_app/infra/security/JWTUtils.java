@@ -55,23 +55,19 @@ public class JWTUtils {
         return Algorithm.HMAC512(secret);
     }
 
-    private Instant getCurrentTime(){
+    private Instant getCurrentTime() {
         return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
     }
 
-    private Instant expirationTime(int hours){
+    private Instant expirationTime(int hours) {
         return LocalDateTime.now().plusHours(hours).atZone(ZoneId.systemDefault()).toInstant();
     }
 
     public String validateTokenLocal(String token) {
-        try {
-            JWTVerifier verifier = JWT.require(getAlgorithm())
-                    .withIssuer("Ubuntu Application")
-                    .build();
-            return verifier.verify(token).getSubject();
-        } catch (JWTVerificationException ex) {
-            return null;
-        }
+        JWTVerifier verifier = JWT.require(getAlgorithm())
+                .withIssuer("Ubuntu Application")
+                .build();
+        return verifier.verify(token).getSubject();
     }
 
     @Transactional(readOnly = false)
@@ -89,7 +85,7 @@ public class JWTUtils {
         userRepository.save(userEntity);
         return generateToken(userEntity, payload);
     }
-    
+
     public Payload extractGooglePayload(String googleToken) {
         HttpTransport transport = new NetHttpTransport();
         GsonFactory gsonFactory = new GsonFactory();
