@@ -22,7 +22,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.model.UserEntity;
-import com.ubuntu.ubuntu_app.model.dto.PayloadData;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.generator.LastNameGenerator;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -52,21 +51,6 @@ public class JWTUtils {
                 .sign(getAlgorithm());
     }
 
-    public String createTokenIfExpired(UserEntity user, String profileImg) {
-        return JWT.create()
-                .withIssuer("Ubuntu Application")
-                .withSubject(user.getEmail())
-                .withClaim("nombre", user.getNombre())
-                .withClaim("apellido", user.getApellido())
-                .withClaim("telefono", user.getTelefono())
-                .withClaim("rol", user.getRol().name())
-                .withClaim("imagen", profileImg)
-                .withIssuedAt(getCurrentTime())
-                .withExpiresAt(expirationTime(1))
-                .withJWTId(UUID.randomUUID().toString())
-                .sign(getAlgorithm());
-    }
-
     private Algorithm getAlgorithm() {
         return Algorithm.HMAC512(secret);
     }
@@ -84,10 +68,6 @@ public class JWTUtils {
                 .withIssuer("Ubuntu Application")
                 .build();
         return verifier.verify(token).getSubject();
-    }
-
-    public PayloadData extractPayloadData(String token) {        
-        return new PayloadData(JWT.decode(token).getSubject(), JWT.decode(token).getClaim("imagen").toString().replace("\"", ""));
     }
 
     @Transactional(readOnly = false)

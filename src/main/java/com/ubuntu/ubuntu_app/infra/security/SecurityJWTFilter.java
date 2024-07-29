@@ -12,7 +12,6 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.ubuntu.ubuntu_app.model.UserEntity;
-import com.ubuntu.ubuntu_app.model.dto.PayloadData;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,7 +36,6 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         String email = null;
         String token = null;
-        String profileImg = null;
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             token = authorizationHeader.replace("Bearer ", "");
             Payload payload = jwtUtils.extractGooglePayload(token);
@@ -60,26 +58,14 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                     email = jwtUtils.validateTokenLocal(token);
                 } catch (TokenExpiredException e) {
                     response.setHeader(HEADER_LOGIN, "Token is expired");
-                    PayloadData tokenData = jwtUtils.extractPayloadData(token);
-                    email = tokenData.getEmail();
-                    profileImg = tokenData.getProfilePicture();
-                    UserEntity userObtained = jwtUtils.userFinder(email);
-                    token = jwtUtils.createTokenIfExpired(userObtained, profileImg);
-                    response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
-                } catch (SignatureVerificationException ex){
-                    System.out.println("Signature");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                } catch (SignatureVerificationException ex) {
                     response.setHeader(HEADER_LOGIN, "Invalid signature");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                } catch (AlgorithmMismatchException x){
-                    System.out.println("Algorithm");
+                } catch (AlgorithmMismatchException x) {
                     response.setHeader(HEADER_LOGIN, "Invalid algorithm");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 }
-                // if (email != null) {
-                //     response.setHeader(HEADER_LOGIN, "Token is valid");
-                // } else {
-                //     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                // }
             }
         }
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
