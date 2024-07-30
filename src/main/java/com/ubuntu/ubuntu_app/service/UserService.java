@@ -4,10 +4,10 @@ import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
-import com.ubuntu.ubuntu_app.model.UserEntity;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserFetchDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
+import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

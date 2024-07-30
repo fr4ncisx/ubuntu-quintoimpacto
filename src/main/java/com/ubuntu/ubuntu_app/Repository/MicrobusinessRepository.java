@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.ubuntu.ubuntu_app.model.MicrobusinessEntity;
+import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 
 import java.util.List;
 

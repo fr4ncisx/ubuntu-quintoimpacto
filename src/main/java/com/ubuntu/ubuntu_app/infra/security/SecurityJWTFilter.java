@@ -11,7 +11,7 @@ import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.ubuntu.ubuntu_app.model.UserEntity;
+import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

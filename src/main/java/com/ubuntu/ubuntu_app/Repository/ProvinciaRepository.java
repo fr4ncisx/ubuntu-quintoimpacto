@@ -1,9 +1,10 @@
 package com.ubuntu.ubuntu_app.Repository;
 
-import com.ubuntu.ubuntu_app.model.ProvinciaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import com.ubuntu.ubuntu_app.model.entities.ProvinciaEntity;
 
 import java.util.List;
 

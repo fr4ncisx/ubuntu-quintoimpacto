@@ -1,4 +1,4 @@
-package com.ubuntu.ubuntu_app.model;
+package com.ubuntu.ubuntu_app.model.entities;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package com.ubuntu.ubuntu_app.model;
+package com.ubuntu.ubuntu_app.model.entities;
 
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;

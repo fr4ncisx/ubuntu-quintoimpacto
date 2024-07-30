@@ -4,9 +4,10 @@ import com.ubuntu.ubuntu_app.Repository.PaisRepository;
 import com.ubuntu.ubuntu_app.Repository.ProvinciaRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
-import com.ubuntu.ubuntu_app.model.PaisEntity;
-import com.ubuntu.ubuntu_app.model.ProvinciaEntity;
 import com.ubuntu.ubuntu_app.model.dto.ProvinciaDto;
+import com.ubuntu.ubuntu_app.model.entities.PaisEntity;
+import com.ubuntu.ubuntu_app.model.entities.ProvinciaEntity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -8,8 +8,8 @@ import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
-import com.ubuntu.ubuntu_app.model.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.dto.CategoryDTO;
+import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 
 @Service
 public class CategoryService {

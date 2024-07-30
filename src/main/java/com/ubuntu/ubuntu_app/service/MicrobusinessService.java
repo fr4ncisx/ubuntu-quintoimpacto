@@ -11,11 +11,11 @@ import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.EmptyFieldException;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
-import com.ubuntu.ubuntu_app.model.CategoryEntity;
-import com.ubuntu.ubuntu_app.model.MicrobusinessEntity;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessCategoryDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessSearchbarDTO;
+import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
+import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 
 import java.util.List;
 import java.util.Optional;

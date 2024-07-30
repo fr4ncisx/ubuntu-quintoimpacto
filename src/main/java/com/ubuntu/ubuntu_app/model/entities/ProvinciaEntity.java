@@ -1,4 +1,4 @@
-package com.ubuntu.ubuntu_app.model;
+package com.ubuntu.ubuntu_app.model.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
