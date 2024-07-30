@@ -15,6 +15,7 @@ import com.ubuntu.ubuntu_app.model.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.MicrobusinessEntity;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessCategoryDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
+import com.ubuntu.ubuntu_app.model.dto.MicrobusinessSearchbarDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,9 +57,9 @@ public class MicrobusinessService {
         if (!nombre.isBlank()) {
             List<MicrobusinessEntity> microBusinessRepo = microbusinessRepository.findByIdNombre(nombre);
             if (!microBusinessRepo.isEmpty()) {
-                List<MicrobusinessDTO> response = microBusinessRepo.stream()
-                .map(dto -> MapperConverter.generate().map(dto, MicrobusinessDTO.class)).toList();
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                var responseDTO = microBusinessRepo.stream()
+                .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
+                return new ResponseEntity<>(responseDTO, HttpStatus.OK);
             } else {
                 throw new SQLemptyDataException("El nombre empezado por '" + nombre + "' no ha arrojado resultados");
             }
