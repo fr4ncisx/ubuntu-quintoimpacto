@@ -12,7 +12,7 @@
     </parent>
     <groupId>com.ubuntu</groupId>
     <artifactId>ubuntu_app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>ubuntu_app</name>
     <description>Ubuntu financiamiento sostenible</description>
     <url />
@@ -53,8 +53,8 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+            <version>3.4.1</version>
+        </dependency>        
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
