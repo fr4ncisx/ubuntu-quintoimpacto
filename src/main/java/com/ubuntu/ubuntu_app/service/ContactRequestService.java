@@ -42,7 +42,7 @@ public class ContactRequestService {
         if (listOfReviewed.isEmpty()) {
             throw new SQLemptyDataException("No se encontraron solicitudes de contacto gestionadas");
         }
-        var responseDTO = convertDto(listOfReviewed);
+        var responseDTO = convertTest(listOfReviewed);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -51,7 +51,7 @@ public class ContactRequestService {
         if (listOfUnreviewed.isEmpty()) {
             throw new SQLemptyDataException("No se encontraron solicitudes de contacto sin gestionar");
         }
-        var responseDTO = convertDto(listOfUnreviewed);
+        var responseDTO = convertTest(listOfUnreviewed);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -69,19 +69,10 @@ public class ContactRequestService {
         return ResponseEntity.ok(ResponseMap.createResponse("Se actualizó el estado a gestionado"));
     }
 
-    public List<?> convertDto(List<ContactRequestEntity> listStatus) {
+    public List<?> convertTest(List<ContactRequestEntity> listStatus) {
         return listStatus.stream()
-                .map(list -> new ContactRequestStatusDTO(
-                        new MicrobusinessNameDTO(
-                                list.getMicrobusiness().getId(),
-                                list.getMicrobusiness().getNombre()),
-                        list.getId(),
-                        list.getDate(),
-                        list.getFullName(),
-                        list.getEmail(),
-                        list.getPhone(),
-                        list.getMessage()))
+                .map(contactRequest -> new ContactRequestStatusDTO(
+                        new MicrobusinessNameDTO(contactRequest.getMicrobusiness()), contactRequest))
                 .toList();
     }
-
 }
