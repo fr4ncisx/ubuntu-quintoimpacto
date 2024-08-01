@@ -35,6 +35,7 @@ public class ContactRequestEntity {
     private String phone;
     @Column(name = "mensaje")
     private String message;
+    @Column(name = "gestionado")
     private boolean reviewed;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_micro")
