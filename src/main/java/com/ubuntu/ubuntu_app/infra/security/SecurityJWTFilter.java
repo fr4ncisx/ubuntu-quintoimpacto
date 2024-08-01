@@ -59,10 +59,10 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 } catch (TokenExpiredException e) {
                     response.setHeader(HEADER_LOGIN, "Token is expired");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                } catch (SignatureVerificationException ex) {
+                } catch (SignatureVerificationException ex){
                     response.setHeader(HEADER_LOGIN, "Invalid signature");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                } catch (AlgorithmMismatchException x) {
+                } catch (AlgorithmMismatchException x){
                     response.setHeader(HEADER_LOGIN, "Invalid algorithm");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 }
