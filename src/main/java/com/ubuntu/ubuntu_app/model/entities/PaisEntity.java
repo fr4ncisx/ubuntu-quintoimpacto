@@ -21,7 +21,12 @@ public class PaisEntity {
     
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_pais")
-    private List<ProvinciaEntity> provincias;
+    private List<ProvinciaEntity> provincias;    
+
+    public PaisEntity(String nombre, List<ProvinciaEntity> provincias) {
+        this.nombre = nombre;
+        this.provincias = provincias;
+    }
 
     public PaisEntity(PaisDto paisDto){
         this.nombre = paisDto.getNombre();

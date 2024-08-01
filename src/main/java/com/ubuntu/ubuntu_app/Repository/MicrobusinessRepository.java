@@ -16,4 +16,8 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
     
     @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.activo = true AND m.categoria.id = (SELECT c.id FROM CategoryEntity c WHERE c.nombre = :category)")
     List<MicrobusinessEntity> findAllActive(String category);
+
+    @Query(value ="DELETE FROM imagenes WHERE id_micro IS NULL" ,nativeQuery = true)
+    void cleanOrphanImages();
+
 }

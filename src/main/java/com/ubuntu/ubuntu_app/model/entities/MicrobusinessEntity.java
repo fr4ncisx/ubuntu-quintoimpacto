@@ -1,10 +1,6 @@
 package com.ubuntu.ubuntu_app.model.entities;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
-import com.ubuntu.ubuntu_app.model.dto.ImageDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
 
 import jakarta.persistence.CascadeType;
@@ -43,11 +39,11 @@ public class MicrobusinessEntity {
     private CategoryEntity categoria;
     private String subcategoria;
     private boolean activo;
-    private boolean gestionado;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_micro",referencedColumnName ="id")
     private List<ImageEntity> imagenes;
 
-    public MicrobusinessEntity(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria) {
+    public MicrobusinessEntity(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria, List<ImageEntity> imagenes) {
         this.nombre = microbusinessDTO.getNombre();
         this.descripcion = microbusinessDTO.getDescripcion();
         this.masInformacion = microbusinessDTO.getMasInformacion();
@@ -57,11 +53,10 @@ public class MicrobusinessEntity {
         this.categoria = categoria;
         this.subcategoria = microbusinessDTO.getSubcategoria();
         this.activo = true;
-        this.gestionado = false;
-        this.imagenes = convertDTOtoEntity(microbusinessDTO.getImagenes());
+        this.imagenes = imagenes;
     }
 
-    public void edit(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria) {
+    public void edit(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria, List<ImageEntity> imagenes) {
         this.nombre = microbusinessDTO.getNombre();
         this.descripcion = microbusinessDTO.getDescripcion();
         this.masInformacion = microbusinessDTO.getMasInformacion();
@@ -70,12 +65,6 @@ public class MicrobusinessEntity {
         this.ciudad = microbusinessDTO.getCiudad();
         this.categoria = categoria;
         this.subcategoria = microbusinessDTO.getSubcategoria();
-        // this.imagenes = microbusinessDTO.getImagenes();
-    }
-
-    public List<ImageEntity> convertDTOtoEntity(List<ImageDTO> dto) {
-        return dto.stream()
-                .map(i -> MapperConverter.generate().map(i, ImageEntity.class))
-                .collect(Collectors.toList());
+        this.imagenes = imagenes;
     }
 }

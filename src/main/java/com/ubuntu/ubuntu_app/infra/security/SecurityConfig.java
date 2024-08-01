@@ -24,23 +24,35 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authRequest -> {
+                    // TODO: Usuarios
                     authRequest.requestMatchers("/user/update").hasRole("ADMIN");
                     authRequest.requestMatchers("/user/deactivate").hasRole("ADMIN");
                     authRequest.requestMatchers("/user/fetch").hasRole("ADMIN");
-                    authRequest.requestMatchers("categories/new").hasRole("ADMIN");
-                    authRequest.requestMatchers("/micro/new").hasRole("ADMIN");
-                    authRequest.requestMatchers("/micro/edit").hasRole("ADMIN");
                     authRequest.requestMatchers("/user/register").hasRole("ADMIN");
+                    // TODO: Categorias
+                    authRequest.requestMatchers("categories/new").hasRole("ADMIN");
+                    authRequest.requestMatchers("/categories/search").permitAll();
+                    // TODO: Microemprendimientos
+                    authRequest.requestMatchers("/micro/find").permitAll();
+                    authRequest.requestMatchers("/micro/find/category").permitAll();
                     authRequest.requestMatchers("/micro/edit").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/delete").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/hide").hasRole("ADMIN");
-                    authRequest.requestMatchers("/categories/search").permitAll();
-                    authRequest.requestMatchers("/micro/find").permitAll();
-                    authRequest.requestMatchers("/micro/find/category").permitAll();
+                    authRequest.requestMatchers("/micro/new").hasRole("ADMIN");
+                    authRequest.requestMatchers("/micro/edit").hasRole("ADMIN");
+                    // TODO: Contact Request
+                    authRequest.requestMatchers("/contact/new-request").permitAll();
+                    authRequest.requestMatchers("/contact/reviewed").hasRole("ADMIN");
+                    authRequest.requestMatchers("/contact/unreviewed").hasRole("ADMIN");
+                    authRequest.requestMatchers("/contact/update").hasRole("ADMIN");
+                    // TODO: Paises y provincias
                     authRequest.requestMatchers("/paises").permitAll();
                     authRequest.requestMatchers("/provincias").permitAll();
+                    // TODO: Login
                     authRequest.requestMatchers("/oauth2/login").permitAll();
+                    // TODO: Cloudinary API
                     authRequest.requestMatchers("/api/cloudinary/**").permitAll();
+                    // TODO: Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
                             "/swagger-ui/**").permitAll();
                     authRequest.anyRequest().authenticated();

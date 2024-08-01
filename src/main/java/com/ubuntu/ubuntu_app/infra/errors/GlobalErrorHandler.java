@@ -118,6 +118,12 @@ public class GlobalErrorHandler {
         errors.put("Error", "Se esperaba un '" + ex.getParameterName() + "' pero no se envio ningun parámetro con ese nombre");
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(IllegalRewriteException.class)
+    public ResponseEntity<?> unwrittableException(IllegalRewriteException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMensaje());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(IOExtensionException.class)
     public ResponseEntity<?> invalidFileExtension(IOExtensionException ex) {

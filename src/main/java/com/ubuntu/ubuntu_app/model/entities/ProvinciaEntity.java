@@ -15,4 +15,8 @@ public class ProvinciaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
+
+    public ProvinciaEntity(String nombre) {
+        this.nombre = nombre;
+    }    
 }

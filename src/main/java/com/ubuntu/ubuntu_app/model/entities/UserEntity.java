@@ -10,13 +10,13 @@ import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
 import com.ubuntu.ubuntu_app.model.enums.UserRole;
+import com.ubuntu.ubuntu_app.model.generator.RandomPhoneGenerator;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
-import java.util.Random;
 
 @Entity
 @Data
@@ -36,13 +36,22 @@ public class UserEntity implements UserDetails {
     private UserRole rol;
     private String telefono;
 
+    public UserEntity(String nombre, String apellido, String email, UserRole rol, String telefono) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+        this.rol = rol;
+        activo = true;
+        this.telefono = telefono;
+    }
+
     public UserEntity(UserDto userDto) {
         nombre = userDto.getNombre();
         apellido = userDto.getApellido();
         email = userDto.getEmail();
         activo = true;
         rol = UserRole.ADMIN;
-        telefono = generatePhone();
+        telefono = RandomPhoneGenerator.create();
     }
 
     public UserEntity(UserGoogleDTO newLocalUser) {
@@ -51,7 +60,7 @@ public class UserEntity implements UserDetails {
         email = newLocalUser.getEmail();
         activo = true;
         rol = UserRole.USER;
-        telefono = generatePhone();
+        telefono = RandomPhoneGenerator.create();
     }
 
     public UserEntity editUser(UserUpdateDTO userDto) {
@@ -95,12 +104,4 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return activo;
     }
-
-    public String generatePhone() {
-        Random rnd = new Random();
-        Long codigoArea = rnd.nextLong(300L, 501L);
-        return "+54 9 " + String.valueOf(codigoArea) + " "
-                + String.valueOf(rnd.nextLong(1111L, 9999L) + " " + String.valueOf(rnd.nextLong(1111L, 9999L)));
-    }
-
 }
