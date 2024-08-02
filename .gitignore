@@ -34,6 +34,3 @@ build/
 
 ### Local environment files ###
 *.env
-
-### Docker ###
-Dockerfile
