@@ -1,7 +1,5 @@
 package com.ubuntu.ubuntu_app.springdoc;
 
-import org.springdoc.core.models.GroupedOpenApi;
-import org.springdoc.webmvc.api.OpenApiResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,12 +21,5 @@ public class SwaggerConfiguration {
                                                                                 .scheme("bearer")
                                                                                 .bearerFormat("JWT")))
                                 .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
-        }
-        @Bean
-        public GroupedOpenApi publicApi() {
-            return GroupedOpenApi.builder()
-                    .group("public")
-                    .pathsToMatch("/**")
-                    .build();
         }
 }
