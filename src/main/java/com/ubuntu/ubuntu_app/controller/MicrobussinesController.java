@@ -128,7 +128,7 @@ public class MicrobussinesController {
         @Operation(summary = "Buscar microemprendimientos", description = "Devuelve microemprendimientos filtrados por la categoria ingresada")
         @GetMapping("/find/category")
         public ResponseEntity<?> findAllMicrobussiness(@RequestParam String name) {
-                return microbusinessService.findAll(name);
+                return microbusinessService.findByCategory(name);
         }
 
         @PutMapping("/hide")
@@ -139,5 +139,9 @@ public class MicrobussinesController {
         @DeleteMapping("/delete")
         public ResponseEntity<?> deleteMcroBussines(@RequestParam Long id) {
                 return microbusinessService.deleteMicro(id);
+        }
+        @GetMapping("/api/find-all")
+        public ResponseEntity<?> findAllMicrobussiness() {
+                return microbusinessService.getAllMicro();
         }
 }

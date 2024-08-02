@@ -38,8 +38,9 @@ public class MicrobusinessService {
             return new ResponseEntity<>(jsonResponse, HttpStatus.BAD_REQUEST);
         }
         var imageEntity = microbusinessDTO.getImagenes().stream()
-        .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();        
-        MicrobusinessEntity microEntity = new MicrobusinessEntity(microbusinessDTO, categoryOptional.get(), imageEntity);
+                .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
+        MicrobusinessEntity microEntity = new MicrobusinessEntity(microbusinessDTO, categoryOptional.get(),
+                imageEntity);
         microbusinessRepository.save(microEntity);
         var jsonResponse = ResponseMap.createResponse("Creado exitosamente");
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
@@ -85,7 +86,7 @@ public class MicrobusinessService {
         }
     }
 
-    public ResponseEntity<?> findAll(String category) {
+    public ResponseEntity<?> findByCategory(String category) {
         var foundMicro = microbusinessRepository.findAllActive(category);
         if (!foundMicro.isEmpty()) {
             var responseDTO = foundMicro.stream()
@@ -119,4 +120,15 @@ public class MicrobusinessService {
             throw new SQLemptyDataException("No se encontro microemprendimiento");
         }
     }
+
+    public ResponseEntity<?> getAllMicro() {
+        var microSearch = microbusinessRepository.findAll();
+        if (microSearch.isEmpty()) {
+            throw new SQLemptyDataException("No se encontaron emprendimientos en la base de datos");
+        }
+        var jsonResponse = microSearch.stream()
+        .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
+        return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
+    }
+
 }
