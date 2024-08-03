@@ -2,6 +2,7 @@ package com.ubuntu.ubuntu_app.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +29,13 @@ import lombok.RequiredArgsConstructor;
 public class ContactRequestController {
 
     private final ContactRequestService contactRequestService;
+
+    @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
+    @PostMapping("/new")
+    public ResponseEntity<?> newTest(@RequestBody @Valid ContactRequestDTO requestMessage,
+            @RequestParam Long id) {
+        return contactRequestService.createMessage(requestMessage, id);
+    }
 
     @ApiResponse(responseCode = "200", description = "Solicitud creada", content = @Content(schema = @Schema(defaultValue = "{\r\n" + //
                 "\t\"Estado\": \"Solicitud de contacto creada exitosamente\"\r\n" + //
