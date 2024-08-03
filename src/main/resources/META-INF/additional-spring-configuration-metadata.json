@@ -13,5 +13,10 @@
     "name": "cloudinary.url-config",
     "type": "String",
     "description": "url de configuracion de Cloudinary necesita tres parámetros, 'public api key' : 'secret api key' @ 'cloudname'"
+  },
+  {
+    "name": "cors.koyeb",
+    "type": "java.lang.String",
+    "description": "koyeb url"
   }
 ]}

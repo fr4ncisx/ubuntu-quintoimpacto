@@ -13,10 +13,13 @@ public class CorsConfiguration implements WebMvcConfigurer{
     @Value("${cors.ip.address}")
     private String ipAddress;
     
+    @Value("${cors.koyeb}")
+    private String koyebIp;
+    
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ipAddress)
+                .allowedOrigins(ipAddress, koyebIp)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "Status", "Registration", "Login")
