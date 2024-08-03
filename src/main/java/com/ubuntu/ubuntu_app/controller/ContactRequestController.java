@@ -30,7 +30,13 @@ public class ContactRequestController {
 
     private final ContactRequestService contactRequestService;
 
-    
+    @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
+    @PostMapping("/new")
+    public ResponseEntity<?> newTest(@RequestBody @Valid ContactRequestDTO requestMessage,
+            @RequestParam Long id) {
+        return contactRequestService.createMessage(requestMessage, id);
+    }
+
     @ApiResponse(responseCode = "200", description = "Solicitud creada", content = @Content(schema = @Schema(defaultValue = "{\r\n" + //
                 "\t\"Estado\": \"Solicitud de contacto creada exitosamente\"\r\n" + //
                 "}")))
@@ -39,7 +45,6 @@ public class ContactRequestController {
                 "}")))
     @Operation(summary = "Crear solicitud de contacto", description = "Crea una nueva solicitud de contacto, recibe como parámetro el id del microemprendimiento")
     @Transactional(readOnly = false)
-    @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
     @PostMapping("/new-request")
     public ResponseEntity<?> newContactMessage(@RequestBody @Valid ContactRequestDTO requestMessage,
             @RequestParam Long id) {
