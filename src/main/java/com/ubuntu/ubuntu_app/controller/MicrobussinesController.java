@@ -23,7 +23,6 @@ public class MicrobussinesController {
         @Autowired
         MicrobusinessService microbusinessService;
 
-        @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
         @PostMapping("/new")
         @Transactional
         @Operation(summary = "Crear microemprendimiento", description = "Crea un nuevo microemprendimiento con sus respectivos datos")

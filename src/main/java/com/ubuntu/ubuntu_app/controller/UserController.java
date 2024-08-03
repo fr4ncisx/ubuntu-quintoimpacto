@@ -40,7 +40,6 @@ public class UserController {
                         + //
                         "\"error\": \"Error de formato en la solicitud\"\n" + //
                         "}")))
-        @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
         @PostMapping("/register")
         public ResponseEntity<?> createNewUser(@RequestBody @Valid UserDto userDto) {
                 return userService.registerUser(userDto);
