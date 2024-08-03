@@ -18,8 +18,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 @Configuration
 public class SwaggerConfiguration {
 
-    @Bean
-    OpenAPI customOpenAPI() {
+        @Bean
+        public OpenAPI customOpenAPI() {
                 return new OpenAPI()
                                 .components(new Components()
                                                 .addSecuritySchemes("bearer-key",
