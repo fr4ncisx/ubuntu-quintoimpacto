@@ -15,11 +15,13 @@ public class CorsConfiguration implements WebMvcConfigurer{
     
     @Value("${cors.koyeb}")
     private String koyebIp;
+
+    private String backendLocal = "http://localhost:8080";
     
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ipAddress, koyebIp)
+                .allowedOrigins(ipAddress, koyebIp, backendLocal)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "Status", "Registration", "Login")
