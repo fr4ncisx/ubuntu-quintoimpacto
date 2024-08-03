@@ -1,6 +1,7 @@
 package com.ubuntu.ubuntu_app.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ public class AuthController {
 
     private static final String HEADER_STATUS = "Status";
 
+    @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
     @PostMapping("/oauth2/login")
     public ResponseEntity<?> receiveTokenByHeader(
             @RequestHeader(name = "Authorization", required = false) String header, HttpServletResponse response) {

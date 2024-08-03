@@ -2,6 +2,7 @@ package com.ubuntu.ubuntu_app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +40,7 @@ public class CategoryController {
             "    \"error\": \"Error body vacio\"\n" +
             "}")))
 
+    @CrossOrigin(origins = "https://ubuntu.koyeb.app/")
     @PostMapping("/new")
     @Operation(summary = "Crear categoría", description = "Se crea una categoria en la base de datos")
     public ResponseEntity<?> createCategory(@RequestBody @Valid CategoryDTO categoryDTO){
