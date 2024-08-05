@@ -46,6 +46,7 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/contact/reviewed").hasRole("ADMIN");
                     authRequest.requestMatchers("/contact/unreviewed").hasRole("ADMIN");
                     authRequest.requestMatchers("/contact/update").hasRole("ADMIN");
+                    authRequest.requestMatchers("/contact/find").hasRole("ADMIN");
                     // TODO: Paises y provincias
                     authRequest.requestMatchers("/paises").permitAll();
                     authRequest.requestMatchers("/provincias").permitAll();
