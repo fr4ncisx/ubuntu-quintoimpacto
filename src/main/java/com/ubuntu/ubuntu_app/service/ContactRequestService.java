@@ -11,6 +11,7 @@ import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.ContactRequestDTO;
+import com.ubuntu.ubuntu_app.model.dto.ContactRequestIdDTO;
 import com.ubuntu.ubuntu_app.model.dto.ContactRequestStatusDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessNameDTO;
 import com.ubuntu.ubuntu_app.model.entities.ContactRequestEntity;
@@ -74,5 +75,16 @@ public class ContactRequestService {
                 .map(contactRequest -> new ContactRequestStatusDTO(
                         new MicrobusinessNameDTO(contactRequest.getMicrobusiness()), contactRequest))
                 .toList();
+    }
+
+    public ResponseEntity<?> findContact(Long id) {
+        var contactEntity = contactRequestRepository.findById(id);
+        if(!contactEntity.isPresent()){
+            throw new SQLemptyDataException("La solicitud de contacto no existe");
+        }
+        var foundContact = contactEntity.get();
+        var jsonResponse = new ContactRequestIdDTO(new MicrobusinessNameDTO(foundContact.getMicrobusiness()), id, foundContact.getDate(), foundContact.getFullName(),
+        foundContact.getEmail(), foundContact.getPhone(), foundContact.getMessage(), foundContact.isReviewed());
+        return ResponseEntity.ok(jsonResponse);
     }
 }
