@@ -20,4 +20,6 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
     @Query(value ="DELETE FROM imagenes WHERE id_micro IS NULL" ,nativeQuery = true)
     void cleanOrphanImages();
 
+    List<MicrobusinessEntity> findByActivoTrue();
+
 }
