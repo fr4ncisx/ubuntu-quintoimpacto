@@ -12,7 +12,8 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @OpenAPIDefinition(
   servers = {
-    @Server(url = "https://ubuntu.koyeb.app/", description = "Default Server URL")
+    @Server(url = "https://ubuntu.koyeb.app/", description = "Deploy server"),
+    @Server(url = "http://localhost:8080/", description = "Local server")
   }
 )
 @Configuration
