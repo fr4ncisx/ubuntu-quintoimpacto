@@ -3,7 +3,7 @@ package com.ubuntu.ubuntu_app.infra.statuses;
 import lombok.Getter;
 
 @Getter
-public class SpringDocResponse {
+public class MicroResponseDoc {
     
     public final static String micro_deleted = "{\r\n" + //
                 "\t\"Estado\": \"El microemprendimiento fue borrado correctamente\"\r\n" + //
