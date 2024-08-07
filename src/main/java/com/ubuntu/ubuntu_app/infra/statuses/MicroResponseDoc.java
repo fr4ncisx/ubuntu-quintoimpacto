@@ -1,8 +1,5 @@
 package com.ubuntu.ubuntu_app.infra.statuses;
 
-import lombok.Getter;
-
-@Getter
 public class MicroResponseDoc {
     
     public final static String micro_deleted = "{\r\n" + //
