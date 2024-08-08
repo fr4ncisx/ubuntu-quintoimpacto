@@ -37,6 +37,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/api/cloudinary",
             "/oauth2/login",
             "/chatbot",
+            "/swagger-ui.html",
             "/swagger-ui/",
             "/v3/api-docs");
 
