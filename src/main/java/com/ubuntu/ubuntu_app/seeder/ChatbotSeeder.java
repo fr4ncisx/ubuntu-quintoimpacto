@@ -84,7 +84,7 @@ public class ChatbotSeeder implements CommandLineRunner {
                 new FAQEntity("quiero agregar mi microemprendimiento",
                         "En el siguiente enlace, encontrarás un formulario donde podrás ingresar tus datos, una descripción detallada de tu emprendimiento y fotos que resalten tu trabajo. Nos encantaría conocer más sobre lo que haces y cómo podemos colaborar juntos. ¡Esperamos ver tu información pronto!"),
                 new FAQEntity("microemprendimientos",
-                        "Puedes ver los microemprendimientos de microemprendimientos en la seccion o En el siguiente enlace, encontrarás un formulario donde podrás ingresar tus datos, una descripción detallada de tu emprendimiento y fotos que resalten tu trabajo. Nos encantaría conocer más sobre lo que haces y cómo podemos colaborar juntos. ¡Esperamos ver tu información pronto!")
+                        "Puedes ver los microemprendimientos en la seccion o en el siguiente enlace, encontrarás un formulario donde podrás ingresar tus datos, una descripción detallada de tu emprendimiento y fotos que resalten tu trabajo. Nos encantaría conocer más sobre lo que haces y cómo podemos colaborar juntos. ¡Esperamos ver tu información pronto!")
 
                 );
        faqRepository.saveAll(listSQL);
