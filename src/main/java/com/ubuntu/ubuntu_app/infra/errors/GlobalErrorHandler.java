@@ -3,6 +3,7 @@ package com.ubuntu.ubuntu_app.infra.errors;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +17,16 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 
 @RestControllerAdvice
 public class GlobalErrorHandler {
+
+    @ExceptionHandler(PSQLException.class)
+    public ResponseEntity<?> duplicatedKeyError(PSQLException ex) {
+        Map<String, String> errors = new HashMap<>();
+        if (ex.getMessage().contains("ERROR: duplicate key value violates unique constraint")) {
+            errors.put("error", "Error de clave duplicada");
+            errors.put("message", "Database ServerSide problem");
+        }
+        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> emptyBodyOrBadJson(HttpMessageNotReadableException ex) {
