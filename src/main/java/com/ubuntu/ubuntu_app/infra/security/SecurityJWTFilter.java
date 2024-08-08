@@ -53,8 +53,9 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+            //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.sendRedirect("http://localhost:5173/login");
+            //response.getWriter().write("{\"Error\": \"Authentication is required\"}");
             return;
         }
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
