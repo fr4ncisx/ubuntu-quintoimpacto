@@ -1,6 +1,8 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,17 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
     private static final String HEADER_STATUS = "Status";
     private static final String HEADER_LOGIN = "Login";
     private static final String HEADER_REGISTRATION = "Registration";
+    private final List<String> publicEndpoints = Arrays.asList(
+            "/categories/search",
+            "/contact/new-request",
+            "/micro/find",
+            "/paises",
+            "/provincias",
+            "/api/cloudinary",
+            "/oauth2/login",
+            "/chatbot",
+            "/swagger-ui/",
+            "/v3/api-docs");
 
     @Autowired
     private JWTUtils jwtUtils;
@@ -36,6 +49,13 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         String email = null;
         String token = null;
+        String uri = request.getRequestURI();
+        boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
+        if (authorizationHeader == null && !isPublicEndpoint) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+            return;
+        }
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             token = authorizationHeader.replace("Bearer ", "");
             Payload payload = jwtUtils.extractGooglePayload(token);
