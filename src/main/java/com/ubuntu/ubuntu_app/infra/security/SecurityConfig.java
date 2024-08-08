@@ -54,6 +54,8 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/oauth2/login").permitAll();
                     // TODO: Cloudinary API
                     authRequest.requestMatchers("/api/cloudinary/**").permitAll();
+                    // TODO: Chatbot
+                    authRequest.requestMatchers("/chatbot/faq/**").permitAll();
                     // TODO: Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
                             "/swagger-ui/**").permitAll();

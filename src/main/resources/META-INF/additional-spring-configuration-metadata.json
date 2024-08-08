@@ -18,5 +18,10 @@
     "name": "cors.koyeb",
     "type": "java.lang.String",
     "description": "koyeb url"
+  },
+  {
+    "name": "bot.threshold",
+    "type": "java.lang.String",
+    "description": "bot range tolerance"
   }
 ]}

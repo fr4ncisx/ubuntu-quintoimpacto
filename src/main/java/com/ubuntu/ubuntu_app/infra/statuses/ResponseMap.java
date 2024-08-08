@@ -12,4 +12,10 @@ public class ResponseMap {
         responseMap.put("Estado", message);
         return responseMap;
     }
+
+    public static Map<String, String> botResponse(String message){
+        Map<String, String> responseMap = new HashMap<>();
+        responseMap.put("Respuesta", message);
+        return responseMap;
+    }
 }
