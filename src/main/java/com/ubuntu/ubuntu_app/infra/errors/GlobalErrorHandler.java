@@ -168,7 +168,7 @@ public class GlobalErrorHandler {
     public ResponseEntity<?> invalidPath(InvalidPathException ex) {
         Map<String, String> errors = new HashMap<>();
         if(ex.getMessage().contains("Malformed input or input contains unmappable characters")){
-            errors.put("Error", "File type contains unmappable chars, please fix your file name or route is too long");
+            errors.put("Error", "File name contains invalid characters, please fix the file name");
             System.out.println(ex.getMessage());
         } else {
             errors.put("Error", "Invalid path check console errors");

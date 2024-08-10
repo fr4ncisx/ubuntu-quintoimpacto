@@ -2,6 +2,7 @@ package com.ubuntu.ubuntu_app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.ubuntu.ubuntu_app.infra.statuses.MicroResponseDoc;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @Tag(name = "Microemprendimiento")
@@ -25,7 +25,7 @@ public class MicrobussinesController {
         MicrobusinessService microbusinessService;
 
         @PostMapping("/new")
-        @Transactional
+        @Transactional(readOnly = false)
         @Operation(summary = "Crear microemprendimiento", description = "Crea un nuevo microemprendimiento con sus respectivos datos")
         @ApiResponse(responseCode = "201", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_created)))
         @ApiResponse(responseCode = "400", description = "Fallo al ingresar datos por campos vacios", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_edit_validation_error)))
@@ -35,7 +35,7 @@ public class MicrobussinesController {
         }
 
         @PutMapping("/edit")
-        @Transactional
+        @Transactional(readOnly = false)
         @Operation(summary = "Editar microemprendimiento", description = "Editar microemprendimiento")
         @ApiResponse(responseCode = "202", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_edit_ok)))
         @ApiResponse(responseCode = "400", description = "Fallo al ingresar datos por campos vacios", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_edit_validation_error)))
@@ -64,6 +64,7 @@ public class MicrobussinesController {
         @ApiResponse(responseCode = "200", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_hide_ok)))
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_not_found_one)))
         @Operation(summary = "Ocultar emprendimiento")
+        @Transactional(readOnly = false)
         @PutMapping("/hide")
         public ResponseEntity<?> hideMicroBussiness(@RequestParam Long id) {
                 return microbusinessService.hideMicro(id);
@@ -72,6 +73,7 @@ public class MicrobussinesController {
         @ApiResponse(responseCode = "200", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_deleted)))
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_not_found_one)))
         @Operation(summary = "Eliminar emprendimiento de la base de datos")
+        @Transactional(readOnly = false)
         @DeleteMapping("/delete")
         public ResponseEntity<?> deleteMcroBussines(@RequestParam Long id) {
                 return microbusinessService.deleteMicro(id);
