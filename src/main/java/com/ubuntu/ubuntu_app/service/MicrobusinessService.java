@@ -122,7 +122,7 @@ public class MicrobusinessService {
     }
 
     public ResponseEntity<?> getAllMicro() {
-        var microSearch = microbusinessRepository.findByActivoTrue();
+        var microSearch = microbusinessRepository.findByActivoTrueOrderByNombreAsc();
         if (microSearch.isEmpty()) {
             throw new SQLemptyDataException("No se encontaron emprendimientos en la base de datos");
         }
