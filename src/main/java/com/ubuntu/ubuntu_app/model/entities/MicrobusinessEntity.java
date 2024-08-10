@@ -28,8 +28,9 @@ public class MicrobusinessEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
+    @Column(length = 512)
     private String descripcion;
-    @Column(name = "mas_informacion")
+    @Column(name = "mas_informacion", length = 512)
     private String masInformacion;
     private String pais;
     private String provincia;
