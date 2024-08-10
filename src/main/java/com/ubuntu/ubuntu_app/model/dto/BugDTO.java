@@ -13,4 +13,7 @@ public class BugDTO {
     @NotBlank
     @NotNull
     private String description;
+    @NotBlank
+    @NotNull
+    private String category;
 }

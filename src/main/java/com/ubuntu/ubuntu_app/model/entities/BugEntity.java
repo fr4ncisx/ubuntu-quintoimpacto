@@ -25,12 +25,14 @@ public class BugEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
+    private String category;
     private LocalDate date;
     private boolean fixed;
     
     public BugEntity(BugDTO bugDTO) {
         this.description = bugDTO.getDescription();
-        this.date = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDate();
+        this.category = bugDTO.getCategory();
+        this.date = LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDate();        
         this.fixed = false;
     }
 
