@@ -11,15 +11,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfiguration implements WebMvcConfigurer{
 
     @Value("${cors.ip.address}")
-    private String ipAddress;
-    
+    private String ipAddress;    
     @Value("${cors.koyeb}")
     private String koyebIp;
+    @Value("${cors.virtual}")
+    private String virtualMachineIp;
     
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ipAddress, koyebIp)
+                .allowedOrigins(ipAddress, koyebIp, virtualMachineIp)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "Status", "Registration", "Login")

@@ -19,9 +19,9 @@ public class BugService {
     private final BugRepository bugRepository;
 
     public ResponseEntity<?> getAll() {
-        var listOfBugs = bugRepository.findAll();
+        var listOfBugs = bugRepository.findByFixedFalse();
         if(listOfBugs.isEmpty()){
-            throw new SQLemptyDataException("No bugs are documented");
+            throw new SQLemptyDataException("There are no unfixed bugs");
         }
         return ResponseEntity.ok(listOfBugs);
     }
