@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.infra.errors;
 
+import java.nio.file.InvalidPathException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,6 +164,18 @@ public class GlobalErrorHandler {
         errors.put("Error", ex.getMensaje());
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InvalidPathException.class)
+    public ResponseEntity<?> invalidPath(InvalidPathException ex) {
+        Map<String, String> errors = new HashMap<>();
+        if(ex.getMessage().contains("Malformed input or input contains unmappable characters")){
+            errors.put("Error", "File type contains unmappable chars, please fix your file name or route is too long");
+        } else {
+            errors.put("Error", "Invalid path check console errors");
+            System.out.println(ex.getMessage());
+        }
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    
     
     private record ShowFieldErrors(String campo, String error) {
     }
