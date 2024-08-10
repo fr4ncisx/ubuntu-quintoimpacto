@@ -23,5 +23,10 @@
     "name": "bot.threshold",
     "type": "java.lang.String",
     "description": "bot range tolerance"
+  },
+  {
+    "name": "cors.virtual",
+    "type": "java.lang.String",
+    "description": "virtual machine host ip"
   }
 ]}
