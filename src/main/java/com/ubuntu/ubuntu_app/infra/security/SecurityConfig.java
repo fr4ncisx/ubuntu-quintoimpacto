@@ -56,6 +56,9 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/api/cloudinary/**").permitAll();
                     // TODO: Chatbot
                     authRequest.requestMatchers("/chatbot/faq/**").permitAll();
+                    // TODO: Bugs
+                    authRequest.requestMatchers("/bug/find").permitAll();
+                    authRequest.requestMatchers("/bug/admin/**").hasRole("ADMIN");
                     // TODO: Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
                             "/swagger-ui/**").permitAll();
