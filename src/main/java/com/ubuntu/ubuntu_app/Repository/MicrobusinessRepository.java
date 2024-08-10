@@ -1,6 +1,7 @@
 package com.ubuntu.ubuntu_app.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +18,8 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
     @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.activo = true AND m.categoria.id = (SELECT c.id FROM CategoryEntity c WHERE c.nombre = :category)")
     List<MicrobusinessEntity> findAllActive(String category);
 
-    @Query(value ="DELETE FROM imagenes WHERE id_micro IS NULL" ,nativeQuery = true)
+    @Modifying
+    @Query(value = "DELETE FROM Imagenes WHERE id_micro IS NULL", nativeQuery = true)
     void cleanOrphanImages();
 
     List<MicrobusinessEntity> findByActivoTrueOrderByNombreAsc();
