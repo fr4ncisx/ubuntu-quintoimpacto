@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ubuntu.ubuntu_app.Repository.BugRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
