@@ -21,11 +21,13 @@ public class ContactRequestDTO {
     private String nombreCompleto;
     @NotNull
     @NotBlank
+    @Size(max = 100, message = "El email es demasiado largo") 
     @Email(message = "Formato de correo invalido")
     @JsonProperty("correo_electronico")
     private String email;
     @NotNull
     @NotBlank
+    @Size(max = 100, message = "El numero de telefono es demasiado largo") 
     @JsonProperty("numero_telefono")
     private String telefono;
     @NotNull
