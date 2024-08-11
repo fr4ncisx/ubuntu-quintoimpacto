@@ -46,7 +46,7 @@ public class BugService {
     }
 
     public ResponseEntity<?> getFixedBugs() {
-        var fixedBugs = bugRepository.findByFixedTrue();
+        var fixedBugs = bugRepository.findByFixedTrueOrderByIdAsc();
         if(fixedBugs.isEmpty()){
             throw new SQLemptyDataException("There are not bugs to display");
         }
