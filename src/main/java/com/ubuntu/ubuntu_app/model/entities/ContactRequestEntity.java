@@ -33,7 +33,7 @@ public class ContactRequestEntity {
     private LocalDate date;
     @Column(name = "telefono")
     private String phone;
-    @Column(name = "mensaje")
+    @Column(name = "mensaje", length = 300)
     private String message;
     @Column(name = "gestionado")
     private boolean reviewed;
