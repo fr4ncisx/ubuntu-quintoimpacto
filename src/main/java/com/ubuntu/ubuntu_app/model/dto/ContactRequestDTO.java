@@ -16,7 +16,8 @@ public class ContactRequestDTO {
     
     @JsonProperty("apellido_nombre")
     @NotNull
-    @NotBlank    
+    @NotBlank
+    @Size(max = 100, message = "El nombre es demasiado largo")    
     private String nombreCompleto;
     @NotNull
     @NotBlank
