@@ -46,7 +46,7 @@ public class JWTUtils {
                 .withClaim("rol", user.getRol().name())
                 .withClaim("imagen", payload.get("picture").toString())
                 .withIssuedAt(getCurrentTime())
-                .withExpiresAt(expirationTime(1))
+                .withExpiresAt(expirationTime(120))
                 .withJWTId(UUID.randomUUID().toString())
                 .sign(getAlgorithm());
     }
@@ -59,8 +59,8 @@ public class JWTUtils {
         return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
     }
 
-    private Instant expirationTime(int hours) {
-        return LocalDateTime.now().plusHours(hours).atZone(ZoneId.systemDefault()).toInstant();
+    private Instant expirationTime(int minutes) {
+        return LocalDateTime.now().plusMinutes(minutes).atZone(ZoneId.systemDefault()).toInstant();
     }
 
     public String validateTokenLocal(String token) {
