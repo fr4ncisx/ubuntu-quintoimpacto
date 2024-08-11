@@ -9,5 +9,7 @@ import com.ubuntu.ubuntu_app.model.entities.BugEntity;
 
 @Repository
 public interface BugRepository extends JpaRepository<BugEntity, Long>{
+    
     List<BugEntity> findByFixedFalse();
+    List<BugEntity> findByFixedTrue();
 }

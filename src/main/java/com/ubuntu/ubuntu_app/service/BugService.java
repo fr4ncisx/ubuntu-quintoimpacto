@@ -44,4 +44,12 @@ public class BugService {
         bugRepository.save(bugFromRepository);
         return ResponseEntity.ok(ResponseMap.createResponse("Bug id #" + id + " mark as fixed"));
     }
+
+    public ResponseEntity<?> getFixedBugs() {
+        var fixedBugs = bugRepository.findByFixedTrue();
+        if(fixedBugs.isEmpty()){
+            throw new SQLemptyDataException("There are not bugs to display");
+        }
+        return ResponseEntity.ok(fixedBugs);
+    }
 }

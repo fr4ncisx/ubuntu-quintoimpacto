@@ -29,6 +29,10 @@ public class BugController {
     public ResponseEntity<?> getAllBugs() {
         return bugService.getAll();
     }
+    @GetMapping("/fixed")
+    public ResponseEntity<?> getFixedBugs() {
+        return bugService.getFixedBugs();
+    }
     @Transactional(readOnly = false)
     @PostMapping("/admin/create")
     public ResponseEntity<?> newBug(@Valid @RequestBody BugDTO bugDTO) {

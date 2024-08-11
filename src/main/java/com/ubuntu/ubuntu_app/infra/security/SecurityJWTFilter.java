@@ -33,6 +33,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/contact/new-request",
             "/micro/find",
             "/bug/find",
+            "/bug/fixed",
             "/paises",
             "/provincias",
             "/api/cloudinary",

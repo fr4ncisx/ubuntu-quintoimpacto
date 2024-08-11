@@ -58,6 +58,7 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/chatbot/faq/**").permitAll();
                     // TODO: Bugs
                     authRequest.requestMatchers("/bug/find").permitAll();
+                    authRequest.requestMatchers("/bug/fixed").permitAll();                    
                     authRequest.requestMatchers("/bug/admin/**").hasRole("ADMIN");
                     // TODO: Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
