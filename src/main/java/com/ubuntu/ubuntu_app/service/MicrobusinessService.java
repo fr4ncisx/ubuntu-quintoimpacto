@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
+import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.EmptyFieldException;
@@ -29,6 +30,8 @@ public class MicrobusinessService {
     private MicrobusinessRepository microbusinessRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private ImageRepository imageRepository;
 
     public ResponseEntity<?> create(MicrobusinessDTO microbusinessDTO) {
         Optional<CategoryEntity> categoryOptional = categoryRepository
@@ -62,7 +65,7 @@ public class MicrobusinessService {
                 var convertedImageEntity = imageDTO.stream()
                         .map(img -> MapperConverter.generate().map(img, ImageEntity.class)).toList();
                 microEntity.edit(microbusinessDTO, categoryEntity, convertedImageEntity);
-                microbusinessRepository.cleanOrphanImages();
+                imageRepository.cleanOrphanImages();
             }
             var jsonResponse = ResponseMap.createResponse("La edición del microemprendimiento fue correcta");
             return new ResponseEntity<>(jsonResponse, HttpStatus.ACCEPTED);
