@@ -19,6 +19,7 @@ import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -132,6 +133,13 @@ public class MicrobusinessService {
         var jsonResponse = microSearch.stream()
         .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
+    }
+
+        public ResponseEntity<?> findAllMicroCurrentMonth() {
+        int actualMonth = LocalDate.now().getMonthValue();
+        int actualYear = LocalDate.now().getYear();
+        var microFoundThisMonth = microbusinessRepository.findByStatistics(actualMonth, actualYear);
+        return ResponseEntity.ok(ResponseMap.responseGeneric("Found", microFoundThisMonth));
     }
 
 }

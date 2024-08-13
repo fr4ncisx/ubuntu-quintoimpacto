@@ -86,4 +86,9 @@ public class MicrobussinesController {
         public ResponseEntity<?> findAllMicrobussiness() {
                 return microbusinessService.getAllMicro();
         }
+        
+        @GetMapping("/api/find-month")
+        public ResponseEntity<?> getMicroByMonth() {
+                return microbusinessService.findAllMicroCurrentMonth();
+        }
 }

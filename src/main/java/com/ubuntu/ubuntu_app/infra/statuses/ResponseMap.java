@@ -18,4 +18,10 @@ public class ResponseMap {
         responseMap.put("Respuesta", message);
         return responseMap;
     }
+
+    public static <T> Map<String, T> responseGeneric(String mapKey,T tValue) {
+        Map<String, T> responseMap = new HashMap<>();
+        responseMap.put(mapKey, tValue);
+        return responseMap;
+    }
 }
