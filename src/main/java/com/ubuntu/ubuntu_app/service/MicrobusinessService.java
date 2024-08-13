@@ -9,6 +9,7 @@ import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.EmptyFieldException;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
@@ -19,8 +20,9 @@ import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 
-import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -135,11 +137,16 @@ public class MicrobusinessService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
-        public ResponseEntity<?> findAllMicroCurrentMonth() {
-        int actualMonth = LocalDate.now().getMonthValue();
-        int actualYear = LocalDate.now().getYear();
-        var microFoundThisMonth = microbusinessRepository.findByStatistics(actualMonth, actualYear);
+    public ResponseEntity<?> findAllMicroCurrentMonth() {
+        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear());
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", microFoundThisMonth));
     }
 
+    public ResponseEntity<?> findAllMicroCategoriesCurrentMonth() {
+        Map<String, Long> listOfStatisticsByCategory = new LinkedHashMap<>();        
+        for (int i = 1; i <= 4; i++) {
+            listOfStatisticsByCategory.put("cat:"+ i, microbusinessRepository.findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
+        }
+        return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfStatisticsByCategory));
+    }
 }

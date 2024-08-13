@@ -279,5 +279,16 @@ public class MicroResponseDoc {
             "\t\t]\r\n" + //
             "\t}\r\n" + //
             "]";
+            public final static String statisticsByMonth = "{\r\n" + //
+                                        "\t\"Found\": 4\r\n" + //
+                                        "}";
+            public final static String statisticsByMonthAndCategory = "{\r\n" + //
+                                        "\t\"Found\": {\r\n" + //
+                                        "\t\t\"cat:1\": 0,\r\n" + //
+                                        "\t\t\"cat:2\": 0,\r\n" + //
+                                        "\t\t\"cat:3\": 0,\r\n" + //
+                                        "\t\t\"cat:4\": 4\r\n" + //
+                                        "\t}\r\n" + //
+                                        "}";
 
 }

@@ -86,9 +86,18 @@ public class MicrobussinesController {
         public ResponseEntity<?> findAllMicrobussiness() {
                 return microbusinessService.getAllMicro();
         }
-        
-        @GetMapping("/api/find-month")
+
+        @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.statisticsByMonth)))
+        @Operation(summary = "Solicitudes de contacto estadisticas por mes actual")
+        @GetMapping("/api/statistics/micro")
         public ResponseEntity<?> getMicroByMonth() {
                 return microbusinessService.findAllMicroCurrentMonth();
+        }
+
+        @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.statisticsByMonthAndCategory)))
+        @Operation(summary = "Solicitudes de contacto estadisticas por mes actual")
+        @GetMapping("/api/statistics/micro-category")
+        public ResponseEntity<?> getMicroByCategoryMonth() {
+                return microbusinessService.findAllMicroCategoriesCurrentMonth();
         }
 }

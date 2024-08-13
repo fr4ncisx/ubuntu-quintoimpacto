@@ -135,4 +135,16 @@ public class ContactRequestController {
     public ResponseEntity<?> findContactRequest(@RequestParam Long id) {
         return contactRequestService.findContact(id);
     }
+
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(defaultValue = "{\r\n" + //
+                        "\t\"Found\": {\r\n" + //
+                        "\t\t\"Reviewed\": 0,\r\n" + //
+                        "\t\t\"Unreviewed\": 0\r\n" + //
+                        "\t}\r\n" + //
+                        "}")))
+    @Operation(summary = "Solicitudes de contacto estadisticas por mes actual")
+    @GetMapping("/statistics/find")
+    public ResponseEntity<?> contactRequestStatisticsMonth() {
+            return contactRequestService.findByStatistics();
+    }
 }

@@ -35,8 +35,8 @@ public class SecurityConfig {
                     // TODO: Microemprendimientos
                     authRequest.requestMatchers("/micro/find").permitAll();
                     authRequest.requestMatchers("/micro/find/category").permitAll();
-                    authRequest.requestMatchers("/micro/api/find-all").hasRole("ADMIN");
-                    authRequest.requestMatchers("/micro/api/find-month").hasRole("ADMIN");
+                    authRequest.requestMatchers("/micro/api/statistics/micro").hasRole("ADMIN");
+                    authRequest.requestMatchers("/micro/api/statistics/micro-category").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/edit").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/delete").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/hide").hasRole("ADMIN");
@@ -45,6 +45,7 @@ public class SecurityConfig {
                     // TODO: Contact Request
                     authRequest.requestMatchers("/contact/new-request").permitAll();
                     authRequest.requestMatchers("/contact/reviewed").hasRole("ADMIN");
+                    authRequest.requestMatchers("/contact/statistics/find").hasRole("ADMIN");                    
                     authRequest.requestMatchers("/contact/unreviewed").hasRole("ADMIN");
                     authRequest.requestMatchers("/contact/update").hasRole("ADMIN");
                     authRequest.requestMatchers("/contact/find").hasRole("ADMIN");

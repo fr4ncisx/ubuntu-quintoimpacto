@@ -22,4 +22,7 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
     @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE MONTH(fecha_creacion) = :actualMonth AND YEAR(fecha_creacion) = :actualYear", nativeQuery = true)
     Long findByStatistics(int actualMonth, int actualYear);
 
+    @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE id_categoria=:categoryId AND MONTH(fecha_creacion) = :month AND YEAR(fecha_creacion) = :year", nativeQuery = true)
+    Long findByCategoryStatistics(int month, int year, int categoryId);
+
 }

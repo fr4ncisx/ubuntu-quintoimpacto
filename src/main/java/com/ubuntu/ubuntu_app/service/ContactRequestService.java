@@ -1,12 +1,15 @@
 package com.ubuntu.ubuntu_app.service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ubuntu.ubuntu_app.Repository.ContactRequestRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
+import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
@@ -86,5 +89,16 @@ public class ContactRequestService {
         var jsonResponse = new ContactRequestIdDTO(new MicrobusinessNameDTO(foundContact.getMicrobusiness()), id, foundContact.getDate(), foundContact.getFullName(),
         foundContact.getEmail(), foundContact.getPhone(), foundContact.getMessage(), foundContact.isReviewed());
         return ResponseEntity.ok(jsonResponse);
+    }
+
+    public ResponseEntity<?> findByStatistics() {
+        Map<String, Long> listOfContactRequest = new LinkedHashMap<>();
+        var reviewed = contactRequestRepository.findByStatisticsContact(true, GlobalDate.getCurrentMonth(),
+                GlobalDate.getCurrentYear());
+        var unreviewed = contactRequestRepository.findByStatisticsContact(false, GlobalDate.getCurrentMonth(),
+                GlobalDate.getCurrentYear());
+        listOfContactRequest.put("Reviewed", reviewed);
+        listOfContactRequest.put("Unreviewed", unreviewed);
+        return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfContactRequest));
     }
 }
