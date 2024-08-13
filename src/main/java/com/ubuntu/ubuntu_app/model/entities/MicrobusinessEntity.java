@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.model.entities;
 
+import java.time.LocalDate;
 import java.util.List;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
 
@@ -32,6 +33,8 @@ public class MicrobusinessEntity {
     private String descripcion;
     @Column(name = "mas_informacion", length = 512)
     private String masInformacion;
+    @Column(name = "fecha_creacion")
+    private LocalDate fecha;
     private String pais;
     private String provincia;
     private String ciudad;
@@ -48,6 +51,7 @@ public class MicrobusinessEntity {
         this.nombre = microbusinessDTO.getNombre();
         this.descripcion = microbusinessDTO.getDescripcion();
         this.masInformacion = microbusinessDTO.getMasInformacion();
+        this.fecha = LocalDate.now();
         this.pais = microbusinessDTO.getPais();
         this.provincia = microbusinessDTO.getProvincia();
         this.ciudad = microbusinessDTO.getCiudad();
