@@ -14,6 +14,6 @@ public interface ContactRequestRepository extends JpaRepository<ContactRequestEn
 
     List<ContactRequestEntity> findByReviewedFalse();
 
-    @Query(value = "SELECT COUNT(id) FROM contacto WHERE gestionado=:b AND MONTH(fecha_creacion)= :month AND YEAR(fecha_creacion)= :year", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM contacto WHERE gestionado=:b AND EXTRACT(MONTH FROM fecha_creacion) = :month AND EXTRACT(YEAR FROM fecha_creacion) = :year", nativeQuery = true)
     Long findByStatisticsContact(boolean b, int month, int year);
 }
