@@ -56,7 +56,7 @@ public class PublicationController {
     }
 
     @GetMapping("/find-all")
-    public ResponseEntity<?> findPublicationById(@RequestParam boolean ordered) {
+    public ResponseEntity<?> findAllPublicationsOrdered(@RequestParam boolean ordered) {
         if (ordered) {
             return publicationService.findAllActiveRecentPublications();
         } else {
