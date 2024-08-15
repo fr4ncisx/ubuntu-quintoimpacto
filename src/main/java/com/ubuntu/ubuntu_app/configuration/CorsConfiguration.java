@@ -14,16 +14,15 @@ public class CorsConfiguration implements WebMvcConfigurer{
     private String ipAddress;    
     @Value("${cors.koyeb}")
     private String koyebIp;
-    @Value("${cors.virtual}")
-    private String virtualMachineIp;
     
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ipAddress, koyebIp, virtualMachineIp)
+                .allowedOrigins(ipAddress, koyebIp)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "Status", "Registration", "Login")
+                .maxAge(3600)
                 .allowCredentials(true);
     }
 }

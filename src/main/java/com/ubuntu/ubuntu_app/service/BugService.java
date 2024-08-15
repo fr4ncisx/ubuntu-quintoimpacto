@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.ubuntu.ubuntu_app.Repository.BugRepository;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.BugDTO;
 import com.ubuntu.ubuntu_app.model.entities.BugEntity;
@@ -21,7 +21,7 @@ public class BugService {
     public ResponseEntity<?> getAll() {
         var listOfBugs = bugRepository.findByFixedFalse();
         if(listOfBugs.isEmpty()){
-            throw new SQLemptyDataException("There are no unfixed bugs");
+            throw new SqlEmptyResponse("There are no unfixed bugs");
         }
         return ResponseEntity.ok(listOfBugs);
     }
@@ -34,7 +34,7 @@ public class BugService {
     public ResponseEntity<?> updateBugStatus(Long id) {
         var optionalBug = bugRepository.findById(id);
         if(!optionalBug.isPresent()){
-            throw new SQLemptyDataException("Bug id doesnt match with any one on database");
+            throw new SqlEmptyResponse("Bug id doesnt match with any one on database");
         }
         var bugFromRepository = optionalBug.get();
         if(bugFromRepository.isFixed()){
@@ -48,7 +48,7 @@ public class BugService {
     public ResponseEntity<?> getFixedBugs() {
         var fixedBugs = bugRepository.findByFixedTrueOrderByIdAsc();
         if(fixedBugs.isEmpty()){
-            throw new SQLemptyDataException("There are not bugs to display");
+            throw new SqlEmptyResponse("There are not bugs to display");
         }
         return ResponseEntity.ok(fixedBugs);
     }

@@ -3,7 +3,7 @@ package com.ubuntu.ubuntu_app.service;
 import com.ubuntu.ubuntu_app.Repository.PaisRepository;
 import com.ubuntu.ubuntu_app.Repository.ProvinciaRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.model.dto.ProvinciaDto;
 import com.ubuntu.ubuntu_app.model.entities.PaisEntity;
 import com.ubuntu.ubuntu_app.model.entities.ProvinciaEntity;
@@ -35,10 +35,10 @@ public class ProvinciaService {
                         .collect(Collectors.toList());
                 return new ResponseEntity<>(provinciasDto, HttpStatus.OK);
             } else {
-                throw new SQLemptyDataException("provincias no encontradas");
+                throw new SqlEmptyResponse("provincias no encontradas");
             }
         }
-        throw new SQLemptyDataException("Pais no encontrado");
+        throw new SqlEmptyResponse("Pais no encontrado");
     }
 
 }

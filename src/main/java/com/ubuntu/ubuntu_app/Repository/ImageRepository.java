@@ -9,8 +9,8 @@ import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 
 @Repository
 public interface ImageRepository extends JpaRepository<ImageEntity, Long> {
-
+    
     @Modifying
-    @Query(value = "DELETE FROM Imagenes WHERE id_micro IS NULL", nativeQuery = true)
+    @Query(value = "DELETE FROM Imagenes WHERE id_publicacion IS NULL AND id_micro IS NULL", nativeQuery = true)
     void cleanOrphanImages();
 }

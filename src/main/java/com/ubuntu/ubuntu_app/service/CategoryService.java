@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.CategoryDTO;
 import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
@@ -30,7 +30,7 @@ public class CategoryService {
             var categoryDTO = categoryList.stream().map(c -> MapperConverter.generate().map(c, CategoryDTO.class)).toList();
             return new ResponseEntity<>(categoryDTO, HttpStatus.ACCEPTED);
         } else {
-            throw new SQLemptyDataException("No se encontraron categorías en la base de datos");
+            throw new SqlEmptyResponse("No se encontraron categorías en la base de datos");
         }
     }
 }

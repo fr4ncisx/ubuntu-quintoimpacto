@@ -68,8 +68,8 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(SQLemptyDataException.class)
-    public ResponseEntity<?> emptyResponse(SQLemptyDataException ex) {
+    @ExceptionHandler(SqlEmptyResponse.class)
+    public ResponseEntity<?> emptyResponse(SqlEmptyResponse ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMensaje());
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
@@ -127,9 +127,11 @@ public class GlobalErrorHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<?> parameterNotPresent(MissingServletRequestParameterException ex) {
         Map<String, String> errors = new HashMap<>();
-        errors.put("Error", "Se esperaba un '" + ex.getParameterName() + "' pero no se envio ningun parámetro con ese nombre");
+        errors.put("Error", "Se esperaba un parámetro " + ex.getParameterType() + " '" + ex.getParameterName()
+                + "' pero no se envio ningun parámetro con ese nombre");
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(IllegalRewriteException.class)
     public ResponseEntity<?> unwrittableException(IllegalRewriteException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -164,10 +166,11 @@ public class GlobalErrorHandler {
         errors.put("Error", ex.getMensaje());
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(InvalidPathException.class)
     public ResponseEntity<?> invalidPath(InvalidPathException ex) {
         Map<String, String> errors = new HashMap<>();
-        if(ex.getMessage().contains("Malformed input or input contains unmappable characters")){
+        if (ex.getMessage().contains("Malformed input or input contains unmappable characters")) {
             errors.put("Error", "File name contains invalid characters, please fix the file name");
             System.out.println(ex.getMessage());
         } else {
@@ -176,8 +179,7 @@ public class GlobalErrorHandler {
         }
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
-    
-    
+
     private record ShowFieldErrors(String campo, String error) {
     }
 

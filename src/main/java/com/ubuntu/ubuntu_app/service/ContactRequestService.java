@@ -11,7 +11,7 @@ import com.ubuntu.ubuntu_app.Repository.ContactRequestRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.ContactRequestDTO;
 import com.ubuntu.ubuntu_app.model.dto.ContactRequestIdDTO;
@@ -37,14 +37,14 @@ public class ContactRequestService {
             contactRequestRepository.save(request);
             return ResponseEntity.ok().body(ResponseMap.createResponse("Solicitud de contacto creada exitosamente"));
         } else {
-            throw new SQLemptyDataException("Falló al buscar emprendimiento con ese id");
+            throw new SqlEmptyResponse("Falló al buscar emprendimiento con ese id");
         }
     }
 
     public ResponseEntity<?> getReviewedMessages() {
         var listOfReviewed = contactRequestRepository.findByReviewedTrue();
         if (listOfReviewed.isEmpty()) {
-            throw new SQLemptyDataException("No se encontraron solicitudes de contacto gestionadas");
+            throw new SqlEmptyResponse("No se encontraron solicitudes de contacto gestionadas");
         }
         var responseDTO = convertTest(listOfReviewed);
         return ResponseEntity.ok(responseDTO);
@@ -53,7 +53,7 @@ public class ContactRequestService {
     public ResponseEntity<?> getNonReviewedMessages() {
         var listOfUnreviewed = contactRequestRepository.findByReviewedFalse();
         if (listOfUnreviewed.isEmpty()) {
-            throw new SQLemptyDataException("No se encontraron solicitudes de contacto sin gestionar");
+            throw new SqlEmptyResponse("No se encontraron solicitudes de contacto sin gestionar");
         }
         var responseDTO = convertTest(listOfUnreviewed);
         return ResponseEntity.ok(responseDTO);
@@ -62,7 +62,7 @@ public class ContactRequestService {
     public ResponseEntity<?> updateReview(Long id) {
         var contactEntity = contactRequestRepository.findById(id);
         if (!contactEntity.isPresent()) {
-            throw new SQLemptyDataException("La solicitud de contacto no existe");
+            throw new SqlEmptyResponse("La solicitud de contacto no existe");
         }
         var obtainedContactRequest = contactEntity.get();
         if (obtainedContactRequest.isReviewed()) {
@@ -83,7 +83,7 @@ public class ContactRequestService {
     public ResponseEntity<?> findContact(Long id) {
         var contactEntity = contactRequestRepository.findById(id);
         if(!contactEntity.isPresent()){
-            throw new SQLemptyDataException("La solicitud de contacto no existe");
+            throw new SqlEmptyResponse("La solicitud de contacto no existe");
         }
         var foundContact = contactEntity.get();
         var jsonResponse = new ContactRequestIdDTO(new MicrobusinessNameDTO(foundContact.getMicrobusiness()), id, foundContact.getDate(), foundContact.getFullName(),

@@ -2,7 +2,7 @@ package com.ubuntu.ubuntu_app.service;
 
 import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserFetchDTO;
@@ -38,7 +38,7 @@ public class UserService {
             var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
             return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
         }
-        throw new SQLemptyDataException("El usuario no existe en la base de datos");
+        throw new SqlEmptyResponse("El usuario no existe en la base de datos");
     }
 
     public ResponseEntity<?> deactivateUser(Long idUserToDeactivate) {
@@ -55,7 +55,7 @@ public class UserService {
                 return new ResponseEntity<>(jsonResponse, HttpStatus.CONFLICT);
             }
         } else {
-            throw new SQLemptyDataException("El usuario no existe en la base de datos");
+            throw new SqlEmptyResponse("El usuario no existe en la base de datos");
         }
     }
 

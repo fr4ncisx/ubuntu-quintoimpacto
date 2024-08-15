@@ -11,7 +11,7 @@ import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.EmptyFieldException;
-import com.ubuntu.ubuntu_app.infra.errors.SQLemptyDataException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessCategoryDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
@@ -73,7 +73,7 @@ public class MicrobusinessService {
             var jsonResponse = ResponseMap.createResponse("La edición del microemprendimiento fue correcta");
             return new ResponseEntity<>(jsonResponse, HttpStatus.ACCEPTED);
         } else {
-            throw new SQLemptyDataException("Microemprendimiento no existe en la base de datos");
+            throw new SqlEmptyResponse("Microemprendimiento no existe en la base de datos");
         }
     }
 
@@ -85,7 +85,7 @@ public class MicrobusinessService {
                         .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                throw new SQLemptyDataException("El nombre empezado por '" + nombre + "' no ha arrojado resultados");
+                throw new SqlEmptyResponse("El nombre empezado por '" + nombre + "' no ha arrojado resultados");
             }
         } else {
             throw new EmptyFieldException("El nombre no debe estar vacio");
@@ -100,7 +100,7 @@ public class MicrobusinessService {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(responseDTO);
         } else {
-            throw new SQLemptyDataException("No se encontraron microemprendimientos");
+            throw new SqlEmptyResponse("No se encontraron microemprendimientos");
         }
     }
 
@@ -112,7 +112,7 @@ public class MicrobusinessService {
             var jsonResponse = ResponseMap.createResponse("El microemprendimiento fue ocultado");
             return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
         } else {
-            throw new SQLemptyDataException("No se encontro microemprendimiento");
+            throw new SqlEmptyResponse("No se encontro microemprendimiento");
         }
     }
 
@@ -123,14 +123,14 @@ public class MicrobusinessService {
             var jsonResponse = ResponseMap.createResponse("El microemprendimiento fue borrado correctamente");
             return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
         } else {
-            throw new SQLemptyDataException("No se encontro microemprendimiento");
+            throw new SqlEmptyResponse("No se encontro microemprendimiento");
         }
     }
 
     public ResponseEntity<?> getAllMicro() {
         var microSearch = microbusinessRepository.findByActivoTrueOrderByNombreAsc();
         if (microSearch.isEmpty()) {
-            throw new SQLemptyDataException("No se encontaron emprendimientos en la base de datos");
+            throw new SqlEmptyResponse("No se encontaron emprendimientos en la base de datos");
         }
         var jsonResponse = microSearch.stream()
         .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();

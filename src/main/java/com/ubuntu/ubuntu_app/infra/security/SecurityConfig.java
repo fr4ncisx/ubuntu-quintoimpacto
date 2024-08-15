@@ -32,6 +32,14 @@ public class SecurityConfig {
                     // TODO: Categorias
                     authRequest.requestMatchers("categories/new").hasRole("ADMIN");
                     authRequest.requestMatchers("/categories/search").permitAll();
+                    // TODO: Publicaciones
+                    authRequest.requestMatchers("/publications/find").permitAll();
+                    authRequest.requestMatchers("/publications/click").permitAll();
+                    authRequest.requestMatchers("/publications/create").hasRole("ADMIN");
+                    authRequest.requestMatchers("/publications/statistics").hasRole("ADMIN");
+                    authRequest.requestMatchers("/publications/edit").hasRole("ADMIN");
+                    authRequest.requestMatchers("/publications/disable").hasRole("ADMIN");
+                    authRequest.requestMatchers("/publications/find-all").hasRole("ADMIN");
                     // TODO: Microemprendimientos
                     authRequest.requestMatchers("/micro/find").permitAll();
                     authRequest.requestMatchers("/micro/find/category").permitAll();
