@@ -96,11 +96,11 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(TokenException.class)
-    public ResponseEntity<?> nullTokenException(TokenException ex) {
+    @ExceptionHandler(IllegalParameterException.class)
+    public ResponseEntity<?> nullTokenException(IllegalParameterException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMensaje());
-        return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

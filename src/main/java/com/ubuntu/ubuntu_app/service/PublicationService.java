@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationViewRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
+import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
@@ -40,7 +40,7 @@ public class PublicationService {
                 .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
         PublicationEntity publicationEntity = new PublicationEntity(publicationsDTO, imageEntity);
         publicationRepository.save(publicationEntity);
-        var jsonResponse = ResponseMap.createResponse("Publicación creada");
+        var jsonResponse = ResponseMap.createResponse("Created publication");
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
@@ -111,14 +111,16 @@ public class PublicationService {
         List<PublicationStatisticsDTO> statistics = new ArrayList<>();
         Long publicationsCount = publicationRepository.count();
         Long Id = null;
+        if (limitSize <= 0) {
+            throw new IllegalParameterException("Expected limitSize above 0");
+        }
         if (publicationsCount == 0) {
             throw new SqlEmptyResponse("Empty publications");
         }
         for (int i = 1; i <= publicationsCount; i++) {
             Id = Long.valueOf(i);
             var publicationEntityOptional = publicationRepository.findByIdCurrentMonthAndActive(Id,
-                    GlobalDate.getCurrentMonth(),
-                    GlobalDate.getCurrentYear());
+                    GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear());
             if (!publicationEntityOptional.isPresent()) {
                 continue;
             }
@@ -130,7 +132,8 @@ public class PublicationService {
         }
         var sortedStatistics = statistics.stream()
                 .sorted(Comparator.comparing(PublicationStatisticsDTO::getVisualizations).reversed())
-                .limit(limitSize).toList();
+                .limit(limitSize)
+                .toList();
         if (sortedStatistics.isEmpty()) {
             throw new SqlEmptyResponse("No publications at current month/year");
         }
