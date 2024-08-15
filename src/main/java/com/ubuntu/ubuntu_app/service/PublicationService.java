@@ -90,7 +90,7 @@ public class PublicationService {
     public ResponseEntity<?> findAllActiveRecentPublications() {
         var listOfPublications = publicationRepository.findAllByActiveTrueOrderByDateDesc();
         if (listOfPublications.isEmpty()) {
-            throw new SqlEmptyResponse("There are publications created");
+            throw new SqlEmptyResponse("No publications found");
         }
         var responseDTO = listOfPublications.stream()
                 .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
@@ -100,7 +100,7 @@ public class PublicationService {
     public ResponseEntity<?> findAll() {
         var listOfPublications = publicationRepository.findAll();
         if (listOfPublications.isEmpty()) {
-            throw new SqlEmptyResponse("There are publications created");
+            throw new SqlEmptyResponse("No publications found");
         }
         var responseDTO = listOfPublications.stream()
                 .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
