@@ -33,7 +33,9 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/contact/new-request",
             "/publications/find",
             "/publications/click",
+            "/publications/find-all",
             "/micro/find",
+            "/micro/find/category",
             "/bug/find",
             "/bug/fixed",
             "/paises",
@@ -58,9 +60,9 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         System.out.println(uri);
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
-            //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.sendRedirect("http://localhost:5173/login");
-            //response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            //response.sendRedirect("http://localhost:5173/login");
+            response.getWriter().write("{\"Error\": \"Authentication is required\"}");
             return;
         }
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
