@@ -33,6 +33,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/contact/new-request",
             "/publications/find",
             "/publications/click",
+            "/publications/search",
             "/publications/find-all",
             "/micro/find",
             "/micro/find/category",
@@ -57,11 +58,10 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         String email = null;
         String token = null;
         String uri = request.getRequestURI();
-        System.out.println(uri);
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            //response.sendRedirect("http://localhost:5173/login");
+            // response.sendRedirect("http://localhost:5173/login");
             response.getWriter().write("{\"Error\": \"Authentication is required\"}");
             return;
         }
@@ -87,11 +87,13 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                     email = jwtUtils.validateTokenLocal(token);
                 } catch (TokenExpiredException e) {
                     response.setHeader(HEADER_LOGIN, "Token is expired");
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                } catch (SignatureVerificationException ex){
+                    response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                    response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+                    return;
+                } catch (SignatureVerificationException ex) {
                     response.setHeader(HEADER_LOGIN, "Invalid signature");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                } catch (AlgorithmMismatchException x){
+                } catch (AlgorithmMismatchException x) {
                     response.setHeader(HEADER_LOGIN, "Invalid algorithm");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 }
@@ -100,15 +102,15 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserEntity user = jwtUtils.userFinder(email);
             if (jwtUtils.validateToken(token, user)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        user, null, user.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null,
+                        user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 response.setHeader(HEADER_STATUS, "Authorized");
                 filterChain.doFilter(request, response);
                 response.setStatus(HttpServletResponse.SC_OK);
                 return;
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setHeader(HEADER_STATUS, "Failed token valid but not in database");
                 return;
             }

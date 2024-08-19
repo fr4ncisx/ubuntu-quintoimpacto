@@ -180,6 +180,13 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalAccessError.class)
+    public ResponseEntity<?> illegalAccessLogin(IllegalAccessError ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMessage());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_GATEWAY);
+    }
+
     private record ShowFieldErrors(String campo, String error) {
     }
 

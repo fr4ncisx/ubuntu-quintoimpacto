@@ -16,5 +16,7 @@ public interface PublicationRepository extends JpaRepository<PublicationEntity, 
     Optional<PublicationEntity> findByIdCurrentMonthAndActive(Long id, int month, int year);
 
     List<PublicationEntity> findAllByActiveTrueOrderByDateDesc();
+
+    List<PublicationEntity> findByTitleLike(String publication);
     
 }

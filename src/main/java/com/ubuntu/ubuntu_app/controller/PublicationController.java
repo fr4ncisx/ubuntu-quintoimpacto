@@ -63,4 +63,9 @@ public class PublicationController {
             return publicationService.findAll();
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPublication(@RequestParam String publication) {
+            return publicationService.findPublication(publication);
+    }
 }

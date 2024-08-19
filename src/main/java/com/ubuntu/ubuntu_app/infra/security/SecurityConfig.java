@@ -35,6 +35,7 @@ public class SecurityConfig {
                     // TODO: Publicaciones
                     authRequest.requestMatchers("/publications/find").permitAll();
                     authRequest.requestMatchers("/publications/click").permitAll();
+                    authRequest.requestMatchers("/publications/search").permitAll();
                     authRequest.requestMatchers("/publications/find-all").permitAll();
                     authRequest.requestMatchers("/publications/create").hasRole("ADMIN");
                     authRequest.requestMatchers("/publications/statistics").hasRole("ADMIN");
