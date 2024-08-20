@@ -85,7 +85,7 @@ public class MicrobusinessService {
                         .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                throw new SqlEmptyResponse("El nombre empezado por '" + nombre + "' no ha arrojado resultados");
+                throw new SqlEmptyResponse("El nombre '" + nombre + "' no ha arrojado resultados");
             }
         } else {
             throw new EmptyFieldException("El nombre no debe estar vacio");

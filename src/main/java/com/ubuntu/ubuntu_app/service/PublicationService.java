@@ -23,6 +23,7 @@ import com.ubuntu.ubuntu_app.model.dto.PublicationStatisticsDTO;
 import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.PublicationEntity;
 import com.ubuntu.ubuntu_app.model.entities.PublicationViewEntity;
+import com.ubuntu.ubuntu_app.model.filters.StringFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -153,12 +154,11 @@ public class PublicationService {
         if(publication.isBlank() || publication == null){
             throw new IllegalParameterException("Input is required");
         }
-        publication = "%" + publication + "%";
-        var listOfPublications = publicationRepository.findByTitleLikeAndActiveTrue(publication);
+        var listOfPublications = publicationRepository.findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
         if(listOfPublications.isEmpty()){
             throw new SqlEmptyResponse("No match found");
         }
         var responseDTO = listOfPublications.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
         return ResponseEntity.ok(responseDTO);
-    }
+    }    
 }
