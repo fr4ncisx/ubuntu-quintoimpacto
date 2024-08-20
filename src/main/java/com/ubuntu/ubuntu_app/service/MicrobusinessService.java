@@ -77,6 +77,14 @@ public class MicrobusinessService {
         }
     }
 
+    /**
+     * Searchbar function
+     * @param nombre
+     * @return list of microbusiness
+     * 
+     * @throws SqlEmptyResponse
+     * @throws EmptyFieldException
+     */
     public ResponseEntity<?> findByName(String nombre) {
         if (!nombre.isBlank()) {
             List<MicrobusinessEntity> microBusinessRepo = microbusinessRepository.findByIdNombre(nombre);

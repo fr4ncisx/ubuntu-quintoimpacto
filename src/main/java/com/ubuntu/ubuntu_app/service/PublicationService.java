@@ -154,11 +154,17 @@ public class PublicationService {
         if(publication.isBlank() || publication == null){
             throw new IllegalParameterException("Input is required");
         }
-        var listOfPublications = publicationRepository.findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
-        if(listOfPublications.isEmpty()){
-            throw new SqlEmptyResponse("No match found");
+        var searchNormalized = publicationRepository.findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
+        if(searchNormalized.isEmpty()){
+            var searchWithLowerCase = publicationRepository.findByTitleLikeAndActiveTrue(publication.toLowerCase());
+            if(searchNormalized.isEmpty()){
+                throw new SqlEmptyResponse("No publications match with that word");
+            } else {
+                var responseLowerCase = searchWithLowerCase.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+                return ResponseEntity.ok(responseLowerCase);
+            }
         }
-        var responseDTO = listOfPublications.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+        var responseDTO = searchNormalized.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
         return ResponseEntity.ok(responseDTO);
     }    
 }
