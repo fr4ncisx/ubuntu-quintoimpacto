@@ -17,6 +17,6 @@ public interface PublicationRepository extends JpaRepository<PublicationEntity, 
 
     List<PublicationEntity> findAllByActiveTrueOrderByDateDesc();
 
-    List<PublicationEntity> findByTitleLike(String publication);
+    List<PublicationEntity> findByTitleLikeAndActiveTrue(String publication);
     
 }

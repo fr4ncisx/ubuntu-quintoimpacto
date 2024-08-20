@@ -154,7 +154,7 @@ public class PublicationService {
             throw new IllegalParameterException("Input is required");
         }
         publication = "%" + publication + "%";
-        var listOfPublications = publicationRepository.findByTitleLike(publication);
+        var listOfPublications = publicationRepository.findByTitleLikeAndActiveTrue(publication);
         if(listOfPublications.isEmpty()){
             throw new SqlEmptyResponse("No match found");
         }
