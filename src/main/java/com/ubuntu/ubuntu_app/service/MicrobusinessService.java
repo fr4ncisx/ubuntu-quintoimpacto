@@ -19,6 +19,7 @@ import com.ubuntu.ubuntu_app.model.dto.MicrobusinessSearchbarDTO;
 import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
+import com.ubuntu.ubuntu_app.model.filters.StringFilter;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,25 +80,24 @@ public class MicrobusinessService {
 
     /**
      * Searchbar function
+     * 
      * @param nombre
      * @return list of microbusiness
-     * 
      * @throws SqlEmptyResponse
      * @throws EmptyFieldException
      */
     public ResponseEntity<?> findByName(String nombre) {
-        if (!nombre.isBlank()) {
-            List<MicrobusinessEntity> microBusinessRepo = microbusinessRepository.findByIdNombre(nombre);
-            if (!microBusinessRepo.isEmpty()) {
-                var response = microBusinessRepo.stream()
-                        .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new SqlEmptyResponse("El nombre '" + nombre + "' no ha arrojado resultados");
-            }
-        } else {
+        if (nombre.isBlank()) {
             throw new EmptyFieldException("El nombre no debe estar vacio");
         }
+        var normalizedInput = StringFilter.getNormalizedInput(nombre);
+        List<MicrobusinessEntity> microBusinessRepo = microbusinessRepository.findByIdNombre(normalizedInput);
+        if (microBusinessRepo.isEmpty()) {
+            throw new SqlEmptyResponse("Microbusiness not found");
+        }
+        var response = microBusinessRepo.stream()
+                .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public ResponseEntity<?> findByCategory(String category) {
@@ -141,19 +141,21 @@ public class MicrobusinessService {
             throw new SqlEmptyResponse("No se encontaron emprendimientos en la base de datos");
         }
         var jsonResponse = microSearch.stream()
-        .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
+                .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<?> findAllMicroCurrentMonth() {
-        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear());
+        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(),
+                GlobalDate.getCurrentYear());
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", microFoundThisMonth));
     }
 
     public ResponseEntity<?> findAllMicroCategoriesCurrentMonth() {
-        Map<String, Long> listOfStatisticsByCategory = new LinkedHashMap<>();        
+        Map<String, Long> listOfStatisticsByCategory = new LinkedHashMap<>();
         for (int i = 1; i <= 4; i++) {
-            listOfStatisticsByCategory.put("cat:"+ i, microbusinessRepository.findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
+            listOfStatisticsByCategory.put("cat:" + i, microbusinessRepository
+                    .findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
         }
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfStatisticsByCategory));
     }

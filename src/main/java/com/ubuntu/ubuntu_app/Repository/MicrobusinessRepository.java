@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEntity, Long>{
 
-    @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.nombre LIKE %:nombre%")
+    @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.nombre LIKE %:nombre% AND activo=true")
     List<MicrobusinessEntity> findByIdNombre(String nombre);
     
     @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.activo = true AND m.categoria.id = (SELECT c.id FROM CategoryEntity c WHERE c.nombre = :category)")
