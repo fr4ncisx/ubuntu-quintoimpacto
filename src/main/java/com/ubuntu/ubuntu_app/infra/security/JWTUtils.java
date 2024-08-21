@@ -129,6 +129,7 @@ public class JWTUtils {
             var userExists = user.get();
             if (userExists.getImagen() == null) {
                 try {
+                    System.out.println("Debería actualizar tu foto de perfil a Cloudinary");
                     var cloudinaryURL = cloudinaryService.profilePhotoUploader(payload.get("picture"), 384);
                     userExists.setImagen(cloudinaryURL);
                 } catch (IOException | URISyntaxException e) {
