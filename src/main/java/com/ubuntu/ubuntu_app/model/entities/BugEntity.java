@@ -6,6 +6,7 @@ import java.time.ZoneId;
 
 import com.ubuntu.ubuntu_app.model.dto.BugDTO;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class BugEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 1000)
     private String description;
     private String category;
     private LocalDate date;
