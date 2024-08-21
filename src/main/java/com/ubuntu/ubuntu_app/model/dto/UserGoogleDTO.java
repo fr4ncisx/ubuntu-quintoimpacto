@@ -11,4 +11,5 @@ public class UserGoogleDTO {
     private String email;
     private String name;
     private String lastName;
+    private String profileImg;
 }

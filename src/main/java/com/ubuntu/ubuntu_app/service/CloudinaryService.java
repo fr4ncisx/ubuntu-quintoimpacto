@@ -2,8 +2,12 @@ package com.ubuntu.ubuntu_app.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,8 +29,7 @@ public class CloudinaryService {
         for (int i = 1; i < file.length + 1; i++) {
             if (file[i - 1] != null) {
                 String fileName = FilenameUtils.getBaseName(file[i - 1].getName());
-                var cloudinaryUrl = cloudinaryConfiguration.getInstance()
-                        .uploader()
+                var cloudinaryUrl = cloudinaryConfiguration.getInstance().uploader()
                         .upload(file[i - 1], ObjectUtils.asMap("public_id", "ubuntu/" + fileName.trim()))
                         .get("secure_url").toString();
                 listOfUrl.put("Imagen " + i, cloudinaryUrl);
@@ -38,19 +41,16 @@ public class CloudinaryService {
     public void singleUploadCloudinary(File file, Map<String, String> listOfUrl) throws IOException {
         if (file != null) {
             String fileName = FilenameUtils.getBaseName(file.getName());
-            var cloudinaryUrl = cloudinaryConfiguration.getInstance()
-                    .uploader()
-                    .upload(file, ObjectUtils.asMap("public_id", "ubuntu/" + fileName.trim()))
-                    .get("secure_url").toString();
+            var cloudinaryUrl = cloudinaryConfiguration.getInstance().uploader()
+                    .upload(file, ObjectUtils.asMap("public_id", "ubuntu/" + fileName.trim())).get("secure_url")
+                    .toString();
             listOfUrl.put("Imagen", cloudinaryUrl);
             file.delete();
         }
     }
 
     public CloudinaryResponseDTO deleteFileFromCloudinary(String public_id) throws IOException {
-        var response = cloudinaryConfiguration.getInstance()
-                .uploader()
-                .destroy(public_id, ObjectUtils.emptyMap());
+        var response = cloudinaryConfiguration.getInstance().uploader().destroy(public_id, ObjectUtils.emptyMap());
         String json = writeJson(response);
         var value = deserializeResponse(json);
         if (value == null) {
@@ -77,4 +77,16 @@ public class CloudinaryService {
         return null;
     }
 
+    public String profilePhotoUploader(Object googleURL, int size) throws IOException, URISyntaxException {        
+        URIBuilder uriBuilder = new URIBuilder(googleURL.toString().replace("s96-c", "s" + size + "-c"));
+        var googleImgURL = uriBuilder.build().toURL();
+        File file = new File(googleImgURL.getFile().substring(googleImgURL.getFile().lastIndexOf('/') + 1));
+        FileUtils.copyURLToFile(googleImgURL, file);
+        String fileBaseName = FilenameUtils.getBaseName(file.getName());
+        var cloudinaryUrl = cloudinaryConfiguration.getInstance().uploader()
+                .upload(file, ObjectUtils.asMap("public_id", "ubuntu/" + fileBaseName.trim())).get("secure_url")
+                .toString();
+        file.delete();
+        return cloudinaryUrl;
+    }
 }

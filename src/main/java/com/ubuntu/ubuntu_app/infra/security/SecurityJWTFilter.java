@@ -1,6 +1,7 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,16 +70,21 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             Payload payload = jwtUtils.extractGooglePayload(token);
             if (payload != null) {
                 email = payload.getEmail();
-                UserEntity userObtained = jwtUtils.userFinder(email);
+                UserEntity userObtained = jwtUtils.userFinder(email, payload);
                 if (userObtained != null) {
                     String newToken = jwtUtils.generateToken(userObtained, payload);
                     response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + newToken);
                     response.setHeader(HEADER_REGISTRATION, "Not required");
                 } else {
-                    String registerToken = jwtUtils.createLocalAccount(payload);
-                    if (registerToken != null) {
-                        response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + registerToken);
-                        response.setHeader(HEADER_REGISTRATION, "Registered");
+                    String registerToken;
+                    try {
+                        registerToken = jwtUtils.createLocalAccount(payload);
+                        if (registerToken != null) {
+                            response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + registerToken);
+                            response.setHeader(HEADER_REGISTRATION, "Registered");
+                        }
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
                     }
                 }
             } else {

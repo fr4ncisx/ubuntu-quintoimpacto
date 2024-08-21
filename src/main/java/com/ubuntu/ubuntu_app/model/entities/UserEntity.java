@@ -34,6 +34,7 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole rol;
     private String telefono;
+    @Column(length = 300)
     private String imagen;
 
     /**
@@ -69,6 +70,7 @@ public class UserEntity implements UserDetails {
         activo = true;
         rol = UserRole.USER;
         telefono = RandomPhoneGenerator.create();
+        imagen = newLocalUser.getProfileImg();
     }
 
     public void editUser(UserUpdateDTO userDto) {

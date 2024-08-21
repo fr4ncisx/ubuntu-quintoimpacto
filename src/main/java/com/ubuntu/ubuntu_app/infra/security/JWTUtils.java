@@ -1,13 +1,13 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,31 +24,29 @@ import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 import com.ubuntu.ubuntu_app.model.generator.LastNameGenerator;
+import com.ubuntu.ubuntu_app.service.CloudinaryService;
+
+import lombok.RequiredArgsConstructor;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.auth0.jwt.JWTVerifier;
 
+@RequiredArgsConstructor
 @Component
 public class JWTUtils {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${jwt.secret.key}")
     private String secret;
 
     public String generateToken(UserEntity user, Payload payload) {
-        return JWT.create()
-                .withIssuer("Ubuntu Application")
-                .withSubject(user.getEmail())
-                .withClaim("nombre", user.getNombre())
-                .withClaim("apellido", user.getApellido())
-                .withClaim("telefono", user.getTelefono())
-                .withClaim("rol", user.getRol().name())
-                .withClaim("imagen", payload.get("picture").toString())
-                .withIssuedAt(getCurrentTime())
-                .withExpiresAt(expirationTime(120))
-                .withJWTId(UUID.randomUUID().toString())
-                .sign(getAlgorithm());
+        return JWT.create().withIssuer("Ubuntu Application").withSubject(user.getEmail())
+                .withClaim("nombre", user.getNombre()).withClaim("apellido", user.getApellido())
+                .withClaim("telefono", user.getTelefono()).withClaim("rol", user.getRol().name())
+                .withClaim("imagen", user.getImagen()).withIssuedAt(getCurrentTime()).withExpiresAt(expirationTime(120))
+                .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());
     }
 
     private Algorithm getAlgorithm() {
@@ -64,23 +62,24 @@ public class JWTUtils {
     }
 
     public String validateTokenLocal(String token) {
-        JWTVerifier verifier = JWT.require(getAlgorithm())
-                .withIssuer("Ubuntu Application")
-                .build();
+        JWTVerifier verifier = JWT.require(getAlgorithm()).withIssuer("Ubuntu Application").build();
         return verifier.verify(token).getSubject();
     }
 
     @Transactional(readOnly = false)
-    public String createLocalAccount(Payload payload) {
+    public String createLocalAccount(Payload payload) throws IOException, URISyntaxException {
         String email = payload.getEmail();
         String given_name = payload.get("given_name").toString();
         Object family_name = payload.get("family_name");
+        Object profile_img = payload.get("picture");
         UserGoogleDTO newLocalUser = null;
         if (family_name != null) {
-            newLocalUser = new UserGoogleDTO(email, given_name, family_name.toString());
+            newLocalUser = new UserGoogleDTO(email, given_name, family_name.toString(), null);
         } else {
-            newLocalUser = new UserGoogleDTO(email, given_name, LastNameGenerator.obtainRandomName());
+            newLocalUser = new UserGoogleDTO(email, given_name, LastNameGenerator.obtainRandomName(), null);
         }
+        var cloudinaryURL = cloudinaryService.profilePhotoUploader(profile_img, 384);
+        newLocalUser.setProfileImg(cloudinaryURL);
         UserEntity userEntity = new UserEntity(newLocalUser);
         userRepository.save(userEntity);
         return generateToken(userEntity, payload);
@@ -102,10 +101,41 @@ public class JWTUtils {
         return null;
     }
 
+    /**
+     * User finder by email
+     * @param email
+     * @return UserEntity if is present
+     */
     public UserEntity userFinder(String email) {
         var user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             return user.get();
+        }
+        return null;
+    }
+
+    /**
+     * Update profile img if doesnt have one in database by using google payload data
+     * @param email
+     * @param payload
+     * @return UserEntity
+     * @throws URISyntaxException 
+     * @throws IOException 
+     */
+    @Transactional
+    public UserEntity userFinder(String email, Payload payload) throws IOException {
+        var user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            var userExists = user.get();
+            if (userExists.getImagen() == null) {
+                try {
+                    var cloudinaryURL = cloudinaryService.profilePhotoUploader(payload.get("picture"), 384);
+                    userExists.setImagen(cloudinaryURL);
+                } catch (IOException | URISyntaxException e) {
+                    return null;
+                }
+            }
+            return userExists;
         }
         return null;
     }

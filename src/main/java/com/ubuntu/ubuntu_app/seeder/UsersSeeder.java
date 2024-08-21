@@ -22,7 +22,7 @@ public class UsersSeeder implements CommandLineRunner{
     @Override
     public void run(String... args) throws Exception {
         if(userRepository.count() == 0){
-            loadUsers();
+            //loadUsers();
         }        
     }
 
