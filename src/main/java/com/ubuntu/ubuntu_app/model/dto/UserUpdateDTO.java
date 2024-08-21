@@ -1,7 +1,7 @@
 package com.ubuntu.ubuntu_app.model.dto;
 
-import com.ubuntu.ubuntu_app.model.enums.UserRole;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +10,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserUpdateDTO {
+    @NotBlank
+    @NotNull
     private String nombre;
+    @NotBlank
+    @NotNull
     private String apellido;
-    private String email;
+    @NotBlank
+    @NotNull
     private String telefono;
-    private UserRole rol;
-    private boolean activo;
+    @NotBlank
+    @NotNull
+    private String imagen;
 }

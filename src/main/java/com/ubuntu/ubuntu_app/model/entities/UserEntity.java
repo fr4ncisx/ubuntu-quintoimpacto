@@ -5,7 +5,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
@@ -35,16 +34,25 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole rol;
     private String telefono;
+    private String imagen;
 
-    public UserEntity(String nombre, String apellido, String email, UserRole rol, String telefono) {
+    /**
+     * <p>Se usa solo para crear el seeder</p>
+     */
+    public UserEntity(String nombre, String apellido, String email, UserRole rol, String telefono, String imagen) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.rol = rol;
         activo = true;
         this.telefono = telefono;
+        this.imagen = imagen;
     }
 
+    /**
+     * DEPRECATED
+     * <p>Se usa solo para el endpoint /register</p>
+     */
     public UserEntity(UserDto userDto) {
         nombre = userDto.getNombre();
         apellido = userDto.getApellido();
@@ -63,24 +71,10 @@ public class UserEntity implements UserDetails {
         telefono = RandomPhoneGenerator.create();
     }
 
-    public UserEntity editUser(UserUpdateDTO userDto) {
-        if (!userDto.getNombre().isBlank()) {
-            nombre = userDto.getNombre();
-        }
-        if (!userDto.getApellido().isBlank()) {
-            apellido = userDto.getApellido();
-        }
-        if (!userDto.getEmail().isBlank()) {
-            email = userDto.getEmail();
-        }
-        if (!userDto.getTelefono().isBlank()) {
-            telefono = userDto.getTelefono();
-        }
-        if (userDto.getRol() != null) {
-            rol = userDto.getRol();
-        }
-        activo = userDto.isActivo();
-        return MapperConverter.generate().map(userDto, UserEntity.class);
+    public void editUser(UserUpdateDTO userDto) {
+            nombre = userDto.getNombre();     
+            apellido = userDto.getApellido();       
+            telefono = userDto.getTelefono(); 
     }
 
     @Override

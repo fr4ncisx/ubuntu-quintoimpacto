@@ -29,11 +29,11 @@ public class UsersSeeder implements CommandLineRunner{
     @Transactional
     private void loadUsers(){
         List<UserEntity> listOfUsers = Arrays.asList(
-            new UserEntity("Ubuntu", "Administracion", "semilleroubuntu.dev@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create()),
-            new UserEntity("Teby", "Ortiz", "tebyortiz888@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create()),
-            new UserEntity("Camila", "Arce", "arce.b.camila@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create()),
-            new UserEntity("Santiago", "perea", "santi2004perea@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create())
-            //new UserEntity("Ivan", "Sanchez", null, UserRole.ADMIN, RandomPhoneGenerator.create()) //TODO: Usuario Ivan, falta email
+            new UserEntity("Ubuntu", "Administracion", "semilleroubuntu.dev@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create(), null),
+            new UserEntity("Teby", "Ortiz", "tebyortiz888@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create(), null),
+            new UserEntity("Camila", "Arce", "arce.b.camila@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create(), null),
+            new UserEntity("Santiago", "perea", "santi2004perea@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create(), null),
+            new UserEntity("Ivan", "Sanchez", null, UserRole.ADMIN, RandomPhoneGenerator.create(), null)
         );
         userRepository.saveAll(listOfUsers);
     }

@@ -31,8 +31,8 @@ public class UserService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
     }
     
-    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, Long id) {
-        Optional<UserEntity> userObtained = userRepository.findById(id);
+    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, String email) {
+        Optional<UserEntity> userObtained = userRepository.findByEmail(email);
         if (userObtained.isPresent()) {
             userObtained.get().editUser(userDto);
             var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
