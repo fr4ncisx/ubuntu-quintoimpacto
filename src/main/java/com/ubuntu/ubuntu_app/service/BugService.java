@@ -19,7 +19,7 @@ public class BugService {
     private final BugRepository bugRepository;
 
     public ResponseEntity<?> getAll() {
-        var listOfBugs = bugRepository.findByFixedFalse();
+        var listOfBugs = bugRepository.findByFixedFalseOrderByDateAsc();
         if(listOfBugs.isEmpty()){
             throw new SqlEmptyResponse("There are no unfixed bugs");
         }
