@@ -19,10 +19,10 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
 
     List<MicrobusinessEntity> findByActivoTrue();
 
-    @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE EXTRACT(YEAR FROM fecha_creacion) = :year AND EXTRACT(MONTH FROM fecha_creacion) = :month", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE activo= true AND EXTRACT(YEAR FROM fecha_creacion) = :year AND EXTRACT(MONTH FROM fecha_creacion) = :month", nativeQuery = true)
     Long findByStatistics(int month, int year);
 
-    @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE id_categoria=:categoryId AND EXTRACT(YEAR FROM fecha_creacion) = :year AND EXTRACT(MONTH FROM fecha_creacion) = :month", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE activo= true AND id_categoria=:categoryId AND EXTRACT(YEAR FROM fecha_creacion) = :year AND EXTRACT(MONTH FROM fecha_creacion) = :month", nativeQuery = true)
     Long findByCategoryStatistics(int month, int year, int categoryId);
 
     List<MicrobusinessEntity> findByEnviadoPorMailFalse();
