@@ -35,7 +35,7 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole rol;
     private String telefono;
-    @Column(length = 300, nullable = true)
+    @Column(length = 600, nullable = true)
     private String imagen;
     @Column(nullable = true)
     private Boolean suscribed;
