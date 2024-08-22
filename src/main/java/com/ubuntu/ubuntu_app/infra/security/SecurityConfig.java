@@ -66,7 +66,7 @@ public class SecurityConfig {
                     // TODO: Cloudinary API
                     authRequest.requestMatchers("/api/cloudinary/**").permitAll();
                     // TODO: Chatbot
-                    authRequest.requestMatchers("/chatbot/faq/**").permitAll();
+                    authRequest.requestMatchers("/chatbot/**").permitAll();
                     // TODO: Bugs
                     authRequest.requestMatchers("/bug/find").permitAll();
                     authRequest.requestMatchers("/bug/fixed").permitAll();                    
