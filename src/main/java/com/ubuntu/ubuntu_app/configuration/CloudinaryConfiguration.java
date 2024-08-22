@@ -1,10 +1,12 @@
 package com.ubuntu.ubuntu_app.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.cloudinary.Cloudinary;
 
+@Lazy
 @Component
 public class CloudinaryConfiguration {
 

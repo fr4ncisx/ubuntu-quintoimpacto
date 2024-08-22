@@ -1,51 +1,230 @@
 package com.ubuntu.ubuntu_app.service;
 
-import com.ubuntu.ubuntu_app.Repository.FAQRepository;
-import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
-import com.ubuntu.ubuntu_app.model.dto.AnswerThreshold;
-import com.ubuntu.ubuntu_app.model.entities.FAQEntity;
-
-import lombok.RequiredArgsConstructor;
-
-import org.apache.commons.text.similarity.JaccardSimilarity;
+import org.apache.commons.text.similarity.CosineSimilarity;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.es.SpanishLightStemFilter;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.ubuntu.ubuntu_app.Repository.ChatbotQuestionsRepository;
+import com.ubuntu.ubuntu_app.Repository.ChatbotRepository;
+import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
+import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
+import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
+import com.ubuntu.ubuntu_app.model.dto.ChatbotCategoriesDTO;
+import com.ubuntu.ubuntu_app.model.dto.ResponseCategories;
+import com.ubuntu.ubuntu_app.model.entities.ChatbotQuestionEntity;
+import com.ubuntu.ubuntu_app.model.entities.ChatbotResponseEntity;
+import com.ubuntu.ubuntu_app.model.filters.StopWords;
 
-@RequiredArgsConstructor
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Lazy
 @Service
 public class ChatBotService {
 
-    private final FAQRepository faqRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ChatBotService.class);
+    private final CosineSimilarity cosineSimilarity;
+    private final ChatbotRepository chatbotRepository;
+    private final ChatbotQuestionsRepository chatbotQuestionsRepository;
+    private final List<InnerChatBotService> debugChatBot = new ArrayList<>();
 
-    @Value("${bot.threshold}")
-    private Double threshold; // 0.6 min score valid
+    @Value("${chatbot.similarity.threshold:0.5}")
+    private double similarityThreshold;
 
-    public ResponseEntity<?> getResponse(String userQuestion) {
-        List<FAQEntity> faqs = faqRepository.findAll();
-        List<AnswerThreshold> listOfValidAnswers = new ArrayList<>();
-        String normalizedInput = userQuestion.toLowerCase().trim();
-        JaccardSimilarity similarity = new JaccardSimilarity();
-        Double distance;
-        String closestMatch = null;
-        for (FAQEntity faq : faqs) {
-            String question = faq.getQuestion().toLowerCase().trim();
-            distance = similarity.apply(normalizedInput, question);
-            listOfValidAnswers.add(new AnswerThreshold(faq.getQuestion(),
-                    faq.getAnswer(), distance));
+    public ChatBotService(ChatbotRepository chatbotRepository, CosineSimilarity cosineSimilarity,
+            ChatbotQuestionsRepository chatbotQuestionsRepository) {
+        this.chatbotRepository = chatbotRepository;
+        this.cosineSimilarity = cosineSimilarity;
+        this.chatbotQuestionsRepository = chatbotQuestionsRepository;
+    }
+
+    public ResponseEntity<?> obtainQuestions(String category) {
+        if(category.isBlank()){
+            throw new IllegalParameterException("Please write a category to search questions");
         }
-        for (AnswerThreshold answer : listOfValidAnswers) {
-            if (answer.getDistance() >= threshold) {
-                closestMatch = answer.getAnswer();
-                break;
-            } else if (answer.getDistance() < threshold) {
-                closestMatch = "Lo siento no pude entender tu pregunta";
+        var questionsFound = chatbotQuestionsRepository.obtainQuestions(category);
+        if (questionsFound.isEmpty()) {
+            throw new SqlEmptyResponse("No questions found");
+        }
+        var questionsDTO = questionsFound.stream().map(q -> MapperConverter.generate().map(q, ChatbotCategoriesDTO.class)).toList();
+        return ResponseEntity.ok(questionsDTO);
+    }
+
+    @Cacheable(value = "botResponseDefault", key = "#id")
+    public ResponseEntity<?> answerResponseByIdAndFilteredCategory(Long id) {
+        var foundQuestion = chatbotQuestionsRepository.findByIdAndCategory(id);
+        if (!foundQuestion.isPresent()) {
+            throw new SqlEmptyResponse("There are no questions with that id");
+        }
+        var getFKofAnswer = chatbotQuestionsRepository.findFKofAnswers(id);
+        var foundAnswer = chatbotRepository.findById(getFKofAnswer.get());
+        if (!foundAnswer.isPresent()) {
+            throw new SqlEmptyResponse("There are no answers with that foreign key");
+        }
+        if(foundAnswer.get().getAnswer().equalsIgnoreCase("Respuesta categorias")){
+            return ResponseEntity.ok(ResponseMap.MultiBotResponse(ResponseCategories.response));
+        }
+        return ResponseEntity.ok(ResponseMap.botResponse(foundAnswer.get().getAnswer()));
+    }
+
+    /**
+     * Processes a user question and returns the best matching response.
+     * 
+     * @param question The user's question
+     * @return ResponseEntity containing the bot's response
+     * @throws InterruptedException
+     */
+    @Cacheable(value = "botResponses", key = "#question")
+    public ResponseEntity<?> getResponse(String question) {
+        String preprocessedQuestion = preprocessText(question);
+        List<ChatbotResponseEntity> faqs;
+        try {
+            faqs = chatbotRepository.findAll();
+        } catch (Exception e) {
+            logger.error("Error fetching FAQs from repository", e);
+            return ResponseEntity.internalServerError()
+                    .body(ResponseMap.botResponse("An error occurred while processing your request."));
+        }
+        debugChatBot.clear();
+        var faqsFiltered = faqs.stream()
+                .filter(f -> f.getPossibleQuestions().stream()
+                        .allMatch(q -> q.getCategory() == null))
+                .collect(Collectors.toList());
+        for (ChatbotResponseEntity faq : faqsFiltered) {
+            for (ChatbotQuestionEntity questionEntity : faq.getPossibleQuestions()) {
+                String preprocessedPossibleQuestion = preprocessText(questionEntity.getQuestion());
+                double cosineScore = calculateCosineSimilarity(preprocessedQuestion, preprocessedPossibleQuestion);
+                debugChatBot.add(new InnerChatBotService(question, faq.getAnswer(), cosineScore));
             }
         }
-        return new ResponseEntity<>(ResponseMap.botResponse(closestMatch), HttpStatus.OK);
+        Optional<InnerChatBotService> bestMatch = debugChatBot.stream()
+                .filter(result -> result.similarityScore() >= similarityThreshold)
+                .max(Comparator.comparing(InnerChatBotService::similarityScore));
+
+        if (bestMatch.isPresent()) {
+            logMatchResult(bestMatch.get());
+            var answerObtained = bestMatch.get().response();
+            var similarityScore = bestMatch.get().similarityScore();
+            return ResponseEntity.ok(ResponseMap.responseGeneric("Respuesta",
+                    new BotResponse(answerObtained, similarityScore)));
+        } else {
+            logNoMatchFound();
+            return ResponseEntity.ok(ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta."));
+        }
+    }
+
+    /**
+     * This is only testing purposes to see how accurate was the score
+     * 
+     * @param match
+     */
+    private void logMatchResult(InnerChatBotService match) {
+        if (match.similarityScore() == 1) {
+            logger.info("Perfect user question found! Similarity Score = {}", match.similarityScore());
+        } else {
+            logger.info("This is the most accurate question found. Similarity Score = {}", match.similarityScore());
+        }
+    }
+
+    /**
+     * This log is just to verify that no match was found
+     * 
+     * @param match
+     */
+    private void logNoMatchFound() {
+        Optional<InnerChatBotService> worstMatch = debugChatBot.stream()
+                .filter(result -> result.similarityScore() < similarityThreshold)
+                .max(Comparator.comparing(InnerChatBotService::similarityScore));
+
+        if (worstMatch.isPresent()) {
+            logger.info("No match found! Similarity Score = {}", worstMatch.get().similarityScore());
+        } else {
+            logger.info("No responses available.");
+        }
+    }
+
+    /**
+     * Calculates the cosine similarity between two questions.
+     * 
+     * @param question1 The first question (user input)
+     * @param question2 The second question (database)
+     * @return The cosine similarity score
+     */
+    private double calculateCosineSimilarity(String question1, String question2) {
+        Map<CharSequence, Integer> vector1 = toVector(question1);
+        Map<CharSequence, Integer> vector2 = toVector(question2);
+        double similarity = cosineSimilarity.cosineSimilarity(vector1, vector2);
+        logger.debug("Similarity between '{}' and '{}' = {}", question1, question2, similarity);
+        return similarity;
+    }
+
+    /**
+     * Converts text to vector
+     * 
+     * @param text
+     * @return converted text as vector
+     */
+    private Map<CharSequence, Integer> toVector(String text) {
+        Map<CharSequence, Integer> vector = new HashMap<>();
+        String[] tokens = text.split("\\s+");
+        for (String token : tokens) {
+            vector.put(token, vector.getOrDefault(token, 0) + 1);
+        }
+        return vector;
+    }
+
+    /**
+     * Preprocesses the input text by tokenizing, stemming, and removing stop words.
+     * 
+     * @param question The input text to preprocess
+     * @return The preprocessed text
+     */
+    @SuppressWarnings("resource")
+    private String preprocessText(String question) {
+        if (question == null || question.isEmpty()) {
+            return "";
+        }
+        try (TokenStream tokenStream = new WhitespaceAnalyzer().tokenStream(null, new StringReader(question));
+                TokenStream filteredTokenStream = new SpanishLightStemFilter(tokenStream)) {
+
+            CharTermAttribute charTermAttribute = filteredTokenStream.addAttribute(CharTermAttribute.class);
+            filteredTokenStream.reset();
+
+            StringBuilder result = new StringBuilder();
+            while (filteredTokenStream.incrementToken()) {
+                String term = charTermAttribute.toString();
+                if (!isStopWord(term)) {
+                    result.append(term).append(' ');
+                }
+            }
+            filteredTokenStream.end();
+
+            return result.length() > 0 ? result.substring(0, result.length() - 1).toLowerCase() : "";
+        } catch (IOException e) {
+            logger.error("Error preprocessing text: {}", question, e);
+            return question.toLowerCase().trim();
+        }
+    }
+
+    private boolean isStopWord(String term) {
+        return StopWords.getLatinAmericanSpanishStopWords().contains(term.toLowerCase());
+    }
+
+    public record InnerChatBotService(String userQuestion, String response, double similarityScore) {
+    }
+
+    public record BotResponse(String answerFound, Double similarityScore) {
     }
 }

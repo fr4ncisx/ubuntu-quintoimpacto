@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
@@ -34,8 +35,10 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole rol;
     private String telefono;
-    @Column(length = 300)
+    @Column(length = 300, nullable = true)
     private String imagen;
+    @Column(nullable = true)
+    private Boolean suscribed;
 
     /**
      * <p>Se usa solo para crear el seeder</p>
@@ -48,6 +51,7 @@ public class UserEntity implements UserDetails {
         activo = true;
         this.telefono = telefono;
         this.imagen = imagen;
+        suscribed = true;
     }
 
     /**
@@ -61,8 +65,17 @@ public class UserEntity implements UserDetails {
         activo = true;
         rol = UserRole.ADMIN;
         telefono = RandomPhoneGenerator.create();
+        suscribed = true;
     }
 
+    /**
+     * <p>
+     * Se usa para crear cuentas en base de datos desde google payload
+     * </p>
+     * 
+     * @param UserGoogleDTO user
+     * 
+     */
     public UserEntity(UserGoogleDTO newLocalUser) {
         nombre = newLocalUser.getName();
         apellido = newLocalUser.getLastName();
@@ -71,12 +84,18 @@ public class UserEntity implements UserDetails {
         rol = UserRole.USER;
         telefono = RandomPhoneGenerator.create();
         imagen = newLocalUser.getProfileImg();
+        suscribed = true;
     }
 
     public void editUser(UserUpdateDTO userDto) {
             nombre = userDto.getNombre();     
             apellido = userDto.getApellido();       
-            telefono = userDto.getTelefono(); 
+            telefono = userDto.getTelefono();
+            if(userDto.isSuscribed() == getSuscribed()){
+                throw new IllegalParameterException("No se puede cambiar el estado de suscripción porque es el mismo");
+            }
+            this.imagen = userDto.getImagen();
+            suscribed = userDto.isSuscribed();
     }
 
     @Override

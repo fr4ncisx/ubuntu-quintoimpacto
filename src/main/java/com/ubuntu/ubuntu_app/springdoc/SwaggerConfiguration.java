@@ -2,6 +2,7 @@ package com.ubuntu.ubuntu_app.springdoc;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
     @Server(url = "http://localhost:8080/", description = "Local server")
   }
 )
+@Lazy
 @Configuration
 public class SwaggerConfiguration {
 

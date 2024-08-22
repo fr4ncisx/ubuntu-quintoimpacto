@@ -29,9 +29,9 @@ public class MicrobusinessEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
-    @Column(length = 512)
+    @Column(length = 300)
     private String descripcion;
-    @Column(name = "mas_informacion", length = 512)
+    @Column(name = "mas_informacion", length = 300)
     private String masInformacion;
     @Column(name = "fecha_creacion")
     private LocalDate fecha;
@@ -46,6 +46,8 @@ public class MicrobusinessEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_micro",referencedColumnName ="id")
     private List<ImageEntity> imagenes;
+    @Column(nullable = true)
+    private Boolean  enviadoPorMail;
 
     public MicrobusinessEntity(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria, List<ImageEntity> imagenes) {
         this.nombre = microbusinessDTO.getNombre();
@@ -59,6 +61,7 @@ public class MicrobusinessEntity {
         this.subcategoria = microbusinessDTO.getSubcategoria();
         this.activo = true;
         this.imagenes = imagenes;
+        this.enviadoPorMail = false;
     }
 
     public void edit(MicrobusinessDTO microbusinessDTO, CategoryEntity categoria, List<ImageEntity> imagenes) {

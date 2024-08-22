@@ -46,7 +46,8 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/chatbot",
             "/swagger-ui.html",
             "/swagger-ui/",
-            "/v3/api-docs");
+            "/v3/api-docs"
+    );
 
     @Autowired
     private JWTUtils jwtUtils;
@@ -61,7 +62,6 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            // response.sendRedirect("http://localhost:5173/login");
             response.getWriter().write("{\"Error\": \"Authentication is required\"}");
             return;
         }
@@ -82,6 +82,11 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                         if (registerToken != null) {
                             response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + registerToken);
                             response.setHeader(HEADER_REGISTRATION, "Registered");
+                        } else {
+                            response.getWriter().write("{\"Error\": \"This step could be because file couldn't save to local\"}");
+                            response.getWriter().flush();
+                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            return;
                         }
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
@@ -92,9 +97,8 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                     email = jwtUtils.validateTokenLocal(token);
                 } catch (TokenExpiredException e) {
                     response.setHeader(HEADER_LOGIN, "Token is expired");
-                    response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
                     response.getWriter().write("{\"Error\": \"Authentication is required\"}");
-                    return;
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 } catch (SignatureVerificationException ex) {
                     response.setHeader(HEADER_LOGIN, "Invalid signature");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -116,7 +120,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 return;
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setHeader(HEADER_STATUS, "Failed token valid but not in database");
+                response.setHeader(HEADER_STATUS, "Internal error validating token/creating user");
                 return;
             }
         }

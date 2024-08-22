@@ -6,6 +6,7 @@ import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -42,10 +43,15 @@ public class JWTUtils {
     private String secret;
 
     public String generateToken(UserEntity user, Payload payload) {
-        return JWT.create().withIssuer("Ubuntu Application").withSubject(user.getEmail())
-                .withClaim("nombre", user.getNombre()).withClaim("apellido", user.getApellido())
-                .withClaim("telefono", user.getTelefono()).withClaim("rol", user.getRol().name())
-                .withClaim("imagen", user.getImagen()).withIssuedAt(getCurrentTime()).withExpiresAt(expirationTime(120))
+		return JWT.create().withIssuer("Ubuntu Application").withSubject(user.getEmail())
+                .withClaim("nombre", user.getNombre())
+                .withClaim("apellido", user.getApellido())
+                .withClaim("telefono", user.getTelefono())
+                .withClaim("rol", user.getRol().name())
+                .withClaim("imagen", user.getImagen())                
+                .withIssuedAt(getCurrentTime()).withExpiresAt(expirationTime(120))
+                .withClaim("expira", LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")).toString())
                 .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());
     }
 
@@ -72,6 +78,10 @@ public class JWTUtils {
         String given_name = payload.get("given_name").toString();
         Object family_name = payload.get("family_name");
         Object profile_img = payload.get("picture");
+        var checkIfUserExists = userFinder(email);
+        if (checkIfUserExists != null) {
+            return null;
+        }
         UserGoogleDTO newLocalUser = null;
         if (family_name != null) {
             newLocalUser = new UserGoogleDTO(email, given_name, family_name.toString(), null);
@@ -122,7 +132,7 @@ public class JWTUtils {
      * @throws URISyntaxException 
      * @throws IOException 
      */
-    @Transactional
+    @Transactional(readOnly = false)
     public UserEntity userFinder(String email, Payload payload) throws IOException {
         var user = userRepository.findByEmail(email);
         if (user.isPresent()) {

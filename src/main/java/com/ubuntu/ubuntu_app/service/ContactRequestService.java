@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import com.ubuntu.ubuntu_app.model.entities.ContactRequestEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Lazy
 @RequiredArgsConstructor
 @Service
 public class ContactRequestService {
@@ -73,22 +75,20 @@ public class ContactRequestService {
         return ResponseEntity.ok(ResponseMap.createResponse("Se actualizó el estado a gestionado"));
     }
 
+    public ResponseEntity<?> findContact(Long id) {
+        var contactEntity = contactRequestRepository.findById(id);
+        if (!contactEntity.isPresent()) {
+            throw new SqlEmptyResponse("La solicitud de contacto no existe");
+        }
+        var jsonResponse = new ContactRequestIdDTO(contactEntity.get());
+        return ResponseEntity.ok(jsonResponse);
+    }
+
     public List<?> convertTest(List<ContactRequestEntity> listStatus) {
         return listStatus.stream()
                 .map(contactRequest -> new ContactRequestStatusDTO(
                         new MicrobusinessNameDTO(contactRequest.getMicrobusiness()), contactRequest))
                 .toList();
-    }
-
-    public ResponseEntity<?> findContact(Long id) {
-        var contactEntity = contactRequestRepository.findById(id);
-        if(!contactEntity.isPresent()){
-            throw new SqlEmptyResponse("La solicitud de contacto no existe");
-        }
-        var foundContact = contactEntity.get();
-        var jsonResponse = new ContactRequestIdDTO(new MicrobusinessNameDTO(foundContact.getMicrobusiness()), id, foundContact.getDate(), foundContact.getFullName(),
-        foundContact.getEmail(), foundContact.getPhone(), foundContact.getMessage(), foundContact.isReviewed());
-        return ResponseEntity.ok(jsonResponse);
     }
 
     public ResponseEntity<?> findByStatistics() {
@@ -101,4 +101,5 @@ public class ContactRequestService {
         listOfContactRequest.put("Unreviewed", unreviewed);
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfContactRequest));
     }
+
 }

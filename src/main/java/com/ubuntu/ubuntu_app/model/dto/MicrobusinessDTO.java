@@ -26,9 +26,11 @@ public class MicrobusinessDTO {
     @NotBlank
     private String provincia;
     @NotBlank
+    @Size(max = 100, message = "El nombre de la ciudad es demasiado largo")
     private String ciudad;
     @NotNull
     private CategoryDTO categoria;
+    @Size(max = 100, message = "El nombre de la subcategoria es demasiado largo")
     private String subcategoria;
     @NotNull
     private List<ImageDTO> imagenes;

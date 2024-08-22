@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import com.ubuntu.ubuntu_app.model.entities.BugEntity;
 
 import lombok.RequiredArgsConstructor;
 
+@Lazy
 @RequiredArgsConstructor
 @Service
 public class BugService {

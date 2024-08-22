@@ -3,6 +3,7 @@ package com.ubuntu.ubuntu_app.seeder;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import com.ubuntu.ubuntu_app.model.generator.RandomPhoneGenerator;
 
 import lombok.RequiredArgsConstructor;
 
+@Lazy
 @RequiredArgsConstructor
 @Component
 public class UsersSeeder implements CommandLineRunner{

@@ -15,18 +15,23 @@
     "description": "url de configuracion de Cloudinary necesita tres parámetros, 'public api key' : 'secret api key' @ 'cloudname'"
   },
   {
+    "name": "chatbot.similarity.threshold",
+    "type": "java.lang.String",
+    "description": "chatbot minimum score to be considered a valid question"
+  },
+  {
+    "name": "email.sender",
+    "type": "java.lang.String",
+    "description": "email'"
+  },
+  {
+    "name": "email.sender.password",
+    "type": "java.lang.String",
+    "description": "email password'"
+  },
+  {
     "name": "cors.koyeb",
     "type": "java.lang.String",
-    "description": "koyeb url"
-  },
-  {
-    "name": "bot.threshold",
-    "type": "java.lang.String",
-    "description": "bot range tolerance"
-  },
-  {
-    "name": "cors.virtual",
-    "type": "java.lang.String",
-    "description": "virtual machine host ip"
+    "description": "A description for 'cors.koyeb'"
   }
 ]}

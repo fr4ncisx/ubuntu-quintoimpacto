@@ -8,7 +8,9 @@ import com.ubuntu.ubuntu_app.model.dto.ProvinciaDto;
 import com.ubuntu.ubuntu_app.model.entities.PaisEntity;
 import com.ubuntu.ubuntu_app.model.entities.ProvinciaEntity;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Lazy
+@RequiredArgsConstructor
 @Service
 public class ProvinciaService {
-    @Autowired
-    private ProvinciaRepository provRepo;
-    @Autowired
-    private PaisRepository paisRepo;
+
+    private final ProvinciaRepository provRepo;
+    private final PaisRepository paisRepo;
 
     public ResponseEntity<?> findProvinceByCountry(String nombrePais) {
         Optional<PaisEntity> pais = paisRepo.findByNombre(nombrePais);

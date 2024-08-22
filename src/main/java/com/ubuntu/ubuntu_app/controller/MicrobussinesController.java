@@ -58,7 +58,7 @@ public class MicrobussinesController {
         @Operation(summary = "Buscar microemprendimientos", description = "Devuelve microemprendimientos filtrados por la categoria ingresada")
         @GetMapping("/find/category")
         public ResponseEntity<?> findAllMicrobussiness(@RequestParam String name) {
-                return microbusinessService.findByCategory(name);
+                return microbusinessService.findAll(name);
         }
 
         @ApiResponse(responseCode = "200", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_hide_ok)))

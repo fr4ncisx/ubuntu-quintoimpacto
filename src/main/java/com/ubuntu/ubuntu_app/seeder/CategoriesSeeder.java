@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
@@ -12,6 +13,7 @@ import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+@Lazy
 @RequiredArgsConstructor
 @Component
 public class CategoriesSeeder implements CommandLineRunner {

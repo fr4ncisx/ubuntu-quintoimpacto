@@ -10,12 +10,14 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ubuntu.ubuntu_app.infra.errors.FileExtensionRecord;
 import com.ubuntu.ubuntu_app.infra.errors.IOExtensionException;
 
+@Lazy
 @Component
 public class FileService {
     

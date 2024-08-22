@@ -9,7 +9,9 @@ import com.ubuntu.ubuntu_app.model.dto.UserFetchDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
 import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Lazy
+@RequiredArgsConstructor
 @Service
-public class UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
+public class UserService {    
+
+    private final UserRepository userRepository;
 
     public ResponseEntity<?> registerUser(UserDto userDto) {
         UserEntity user = new UserEntity(userDto);
@@ -31,8 +34,8 @@ public class UserService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
     }
     
-    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, String email) {
-        Optional<UserEntity> userObtained = userRepository.findByEmail(email);
+    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, Long id) {
+        Optional<UserEntity> userObtained = userRepository.findById(id);
         if (userObtained.isPresent()) {
             userObtained.get().editUser(userDto);
             var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
@@ -65,6 +68,20 @@ public class UserService {
         .map(userEntity, UserFetchDTO.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    public String [] findAllEmails(){
+        List<String> adminEmail = userRepository.findUsersEmail();
+        return adminEmail.toArray(new String[0]);
+    }
+
+    public ResponseEntity<?> getUserByEmail(String email) {
+        var userFound = userRepository.findByEmail(email);
+        if(!userFound.isPresent()){
+            throw new SqlEmptyResponse("No user found with email: " + email);
+        }
+        var jsonResponse = MapperConverter.generate().map(userFound.get(), UserUpdateDTO.class);
+        return ResponseEntity.ok(jsonResponse);
     }
 
 }

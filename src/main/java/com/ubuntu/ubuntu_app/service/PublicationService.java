@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationViewRepository;
@@ -27,6 +29,7 @@ import com.ubuntu.ubuntu_app.model.filters.StringFilter;
 
 import lombok.RequiredArgsConstructor;
 
+@Lazy
 @RequiredArgsConstructor
 @Service
 public class PublicationService {
@@ -41,7 +44,7 @@ public class PublicationService {
                 .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
         PublicationEntity publicationEntity = new PublicationEntity(publicationsDTO, imageEntity);
         publicationRepository.save(publicationEntity);
-        var jsonResponse = ResponseMap.createResponse("Created publication");
+        var jsonResponse = ResponseMap.createResponse("Publicación creada");
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
@@ -144,23 +147,20 @@ public class PublicationService {
     }
 
     public ResponseEntity<?> findPublication(String publication) {
-        if (publication.isBlank() || publication == null) {
+        if(publication.isBlank() || publication == null){
             throw new IllegalParameterException("Input is required");
         }
-        var searchNormalized = publicationRepository
-                .findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
-        if (searchNormalized.isEmpty()) {
+        var searchNormalized = publicationRepository.findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
+        if(searchNormalized.isEmpty()){
             var searchWithLowerCase = publicationRepository.findByTitleLikeAndActiveTrue(publication.toLowerCase());
-            if (searchNormalized.isEmpty()) {
+            if(searchNormalized.isEmpty()){
                 throw new SqlEmptyResponse("No publications match with that word");
             } else {
-                var responseLowerCase = searchWithLowerCase.stream()
-                        .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+                var responseLowerCase = searchWithLowerCase.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
                 return ResponseEntity.ok(responseLowerCase);
             }
         }
-        var responseDTO = searchNormalized.stream()
-                .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+        var responseDTO = searchNormalized.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
         return ResponseEntity.ok(responseDTO);
     }
 }

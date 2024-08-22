@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,13 +17,15 @@ import com.ubuntu.ubuntu_app.infra.errors.FileExceededException;
 import com.ubuntu.ubuntu_app.infra.errors.FileNotFoundException;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 
+import lombok.RequiredArgsConstructor;
+
+@Lazy
+@RequiredArgsConstructor
 @Service
 public class ImageService {
 
-    @Autowired
-    private FileService fileService;
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final FileService fileService;
+    private final CloudinaryService cloudinaryService;
 
     public ResponseEntity<?> uploadImages(MultipartFile[] images) throws IOException {
         if (images.length == 0) {
@@ -102,4 +104,8 @@ public class ImageService {
                 .body(ResponseMap
                         .createResponse("Hubo un error al validar la extensión, comunicate con un desarrollador"));
     }
+    public void cargarImagenDB(File f){
+        
+    }
+    
 }

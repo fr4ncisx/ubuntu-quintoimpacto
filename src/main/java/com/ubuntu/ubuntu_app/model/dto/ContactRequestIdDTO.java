@@ -2,6 +2,9 @@ package com.ubuntu.ubuntu_app.model.dto;
 
 import java.time.LocalDate;
 
+import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import com.ubuntu.ubuntu_app.model.entities.ContactRequestEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContactRequestIdDTO {
-
     private MicrobusinessNameDTO microemprendimiento;
     private Long id;
     private LocalDate fecha_solicitud;
@@ -19,4 +21,15 @@ public class ContactRequestIdDTO {
     private String telefono;
     private String mensaje;
     private boolean gestionado;
+
+    public ContactRequestIdDTO(ContactRequestEntity contactRequest) {
+        this.microemprendimiento = MapperConverter.generate().map(contactRequest.getMicrobusiness(), MicrobusinessNameDTO.class);
+        this.id = contactRequest.getId();
+        this.fecha_solicitud = contactRequest.getDate();
+        this.nombre = contactRequest.getFullName();
+        this.email = contactRequest.getEmail();
+        this.telefono = contactRequest.getPhone();
+        this.mensaje = contactRequest.getMessage();
+        this.gestionado = contactRequest.isReviewed();
+    }
 }

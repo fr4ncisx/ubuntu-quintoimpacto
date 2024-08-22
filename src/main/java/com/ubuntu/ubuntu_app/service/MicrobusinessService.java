@@ -1,6 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,21 +21,24 @@ import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 import com.ubuntu.ubuntu_app.model.filters.StringFilter;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Lazy
+@RequiredArgsConstructor
 @Service
 public class MicrobusinessService {
 
-    @Autowired
-    private MicrobusinessRepository microbusinessRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private ImageRepository imageRepository;
+
+    private final MicrobusinessRepository microbusinessRepository;
+    private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
 
     public ResponseEntity<?> create(MicrobusinessDTO microbusinessDTO) {
         Optional<CategoryEntity> categoryOptional = categoryRepository
@@ -45,9 +48,8 @@ public class MicrobusinessService {
             return new ResponseEntity<>(jsonResponse, HttpStatus.BAD_REQUEST);
         }
         var imageEntity = microbusinessDTO.getImagenes().stream()
-                .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
-        MicrobusinessEntity microEntity = new MicrobusinessEntity(microbusinessDTO, categoryOptional.get(),
-                imageEntity);
+        .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();        
+        MicrobusinessEntity microEntity = new MicrobusinessEntity(microbusinessDTO, categoryOptional.get(), imageEntity);
         microbusinessRepository.save(microEntity);
         var jsonResponse = ResponseMap.createResponse("Creado exitosamente");
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
@@ -78,14 +80,6 @@ public class MicrobusinessService {
         }
     }
 
-    /**
-     * Searchbar function
-     * 
-     * @param nombre
-     * @return list of microbusiness
-     * @throws SqlEmptyResponse
-     * @throws EmptyFieldException
-     */
     public ResponseEntity<?> findByName(String nombre) {
         if (nombre.isBlank()) {
             throw new EmptyFieldException("El nombre no debe estar vacio");
@@ -100,7 +94,7 @@ public class MicrobusinessService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> findByCategory(String category) {
+    public ResponseEntity<?> findAll(String category) {
         var foundMicro = microbusinessRepository.findAllActive(category);
         if (!foundMicro.isEmpty()) {
             var responseDTO = foundMicro.stream()
@@ -136,27 +130,38 @@ public class MicrobusinessService {
     }
 
     public ResponseEntity<?> getAllMicro() {
-        var microSearch = microbusinessRepository.findByActivoTrueOrderByNombreAsc();
+        var microSearch = microbusinessRepository.findByActivoTrue();
         if (microSearch.isEmpty()) {
             throw new SqlEmptyResponse("No se encontaron emprendimientos en la base de datos");
         }
         var jsonResponse = microSearch.stream()
-                .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
+        .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<?> findAllMicroCurrentMonth() {
-        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(),
-                GlobalDate.getCurrentYear());
+        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear());
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", microFoundThisMonth));
     }
 
     public ResponseEntity<?> findAllMicroCategoriesCurrentMonth() {
-        Map<String, Long> listOfStatisticsByCategory = new LinkedHashMap<>();
+        Map<String, Long> listOfStatisticsByCategory = new LinkedHashMap<>();        
         for (int i = 1; i <= 4; i++) {
-            listOfStatisticsByCategory.put("cat:" + i, microbusinessRepository
-                    .findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
+            listOfStatisticsByCategory.put("cat:"+ i, microbusinessRepository.findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
         }
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfStatisticsByCategory));
+    }
+    @Transactional
+    public List <MicrobusinessDTO>microsNotSent(){
+        List<MicrobusinessEntity> microSearch = microbusinessRepository.findByEnviadoPorMailFalse();
+        microsTosent(microSearch);
+        return microSearch.stream().map(entity -> MapperConverter.generate()
+                .map(entity, MicrobusinessDTO.class)).collect(Collectors.toList());
+    }
+
+    private void microsTosent(List <MicrobusinessEntity> microsEntity){
+        for (MicrobusinessEntity m : microsEntity){
+            m.setEnviadoPorMail(true);
+        }
     }
 }

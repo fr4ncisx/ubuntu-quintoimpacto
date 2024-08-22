@@ -19,7 +19,9 @@ public class UserUpdateDTO {
     @NotBlank
     @NotNull
     private String telefono;
-    @NotBlank
     @NotNull
+    @NotBlank
     private String imagen;
+    @NotNull
+    private boolean suscribed;
 }
