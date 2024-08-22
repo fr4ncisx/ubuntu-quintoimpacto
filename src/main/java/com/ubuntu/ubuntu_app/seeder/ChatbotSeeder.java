@@ -138,7 +138,7 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 new ChatbotQuestionEntity(null, "muchas gracias", null),
                                 new ChatbotQuestionEntity(null, "muchisimas gracias", null))
                                 ),
-                                new ChatbotResponseEntity(null, "Psst.. esta es una respuesta secreta.. si, Cristobal Colón descubrió américa en el año 1492", Arrays.asList(
+                                new ChatbotResponseEntity(null, "Psst.. esta es una respuesta secreta.. Cristobal Colón descubrió américa en el año 1492", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "1492", null),
                                 new ChatbotQuestionEntity(null, "conquista", null),
                                 new ChatbotQuestionEntity(null, "Cristobal Colón", null),
