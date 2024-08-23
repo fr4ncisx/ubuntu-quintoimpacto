@@ -33,5 +33,10 @@
     "name": "cors.koyeb",
     "type": "java.lang.String",
     "description": "A description for 'cors.koyeb'"
+  },
+  {
+    "name": "token.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'token.expiration'"
   }
 ]}

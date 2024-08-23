@@ -42,17 +42,20 @@ public class JWTUtils {
     @Value("${jwt.secret.key}")
     private String secret;
 
-    public String generateToken(UserEntity user, Payload payload) {
-		return JWT.create().withIssuer("Ubuntu Application").withSubject(user.getEmail())
-                .withClaim("nombre", user.getNombre())
-                .withClaim("apellido", user.getApellido())
-                .withClaim("telefono", user.getTelefono())
-                .withClaim("rol", user.getRol().name())
-                .withClaim("imagen", user.getImagen())                
-                .withIssuedAt(getCurrentTime()).withExpiresAt(expirationTime(120))
-                .withClaim("expira", LocalDateTime.now().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")).toString())
-                .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());
+    public String generateToken(UserEntity user, Payload payload, int expirationTime) {
+		return JWT.create()
+            .withIssuer("Ubuntu Application")
+            .withSubject(user.getEmail())
+            .withIssuedAt(getCurrentTime())
+            .withExpiresAt(expirationTime(expirationTime))            
+            .withClaim("nombre", user.getNombre())
+            .withClaim("apellido", user.getApellido())
+            .withClaim("telefono", user.getTelefono())
+            .withClaim("rol", user.getRol().name())
+            .withClaim("imagen", user.getImagen())   
+            .withClaim("vencimiento", LocalDateTime.ofInstant(expirationTime(expirationTime), ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")).toString())         
+            .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());
     }
 
     private Algorithm getAlgorithm() {
@@ -73,7 +76,7 @@ public class JWTUtils {
     }
 
     @Transactional(readOnly = false)
-    public String createLocalAccount(Payload payload) throws IOException, URISyntaxException {
+    public String createLocalAccount(Payload payload, int expirationTime) throws IOException, URISyntaxException {
         String email = payload.getEmail();
         String given_name = payload.get("given_name").toString();
         Object family_name = payload.get("family_name");
@@ -92,7 +95,7 @@ public class JWTUtils {
         newLocalUser.setProfileImg(cloudinaryURL);
         UserEntity userEntity = new UserEntity(newLocalUser);
         userRepository.save(userEntity);
-        return generateToken(userEntity, payload);
+        return generateToken(userEntity, payload, expirationTime);
     }
 
     public Payload extractGooglePayload(String googleToken) {

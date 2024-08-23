@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,9 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/v3/api-docs"
     );
 
+    @Value("${token.expiration:120}")
+    private int expirationTime;
+
     @Autowired
     private JWTUtils jwtUtils;
 
@@ -72,13 +76,13 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 email = payload.getEmail();
                 UserEntity userObtained = jwtUtils.userFinder(email, payload);
                 if (userObtained != null) {
-                    String newToken = jwtUtils.generateToken(userObtained, payload);
+                    String newToken = jwtUtils.generateToken(userObtained, payload, expirationTime);
                     response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + newToken);
                     response.setHeader(HEADER_REGISTRATION, "Not required");
                 } else {
                     String registerToken;
                     try {
-                        registerToken = jwtUtils.createLocalAccount(payload);
+                        registerToken = jwtUtils.createLocalAccount(payload, expirationTime);
                         if (registerToken != null) {
                             response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + registerToken);
                             response.setHeader(HEADER_REGISTRATION, "Registered");
