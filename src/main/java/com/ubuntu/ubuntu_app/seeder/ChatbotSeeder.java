@@ -91,6 +91,7 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 new ChatbotQuestionEntity(null, "newsletter", null),
                                 new ChatbotQuestionEntity(null, "suscribirme", null),
                                 new ChatbotQuestionEntity(null, "suscripción", null),
+                                new ChatbotQuestionEntity(null, "suscribo", null),
                                 new ChatbotQuestionEntity(null, "obtener semanalmente", null))
                                 ),
                                 new ChatbotResponseEntity(null, "Si estás pensando en invertir, debes presionar el botón de “Contactar” y completar el formulario que aparecerá, con tus datos de contacto. Y luego nuestros asistentes se pondrán en contacto", Arrays.asList(
@@ -137,7 +138,6 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 new ChatbotQuestionEntity(null, "ubuntu", null))
                                 ),
                                 new ChatbotResponseEntity(null, "De nada es un placer ayudarte para eso estamos!, puedes continuar con tu estancia o preguntarme lo que quieras", Arrays.asList(
-                                new ChatbotQuestionEntity(null, "gracias", null),
                                 new ChatbotQuestionEntity(null, "muchas gracias", null),
                                 new ChatbotQuestionEntity(null, "muchisimas gracias", null))
                                 ),
