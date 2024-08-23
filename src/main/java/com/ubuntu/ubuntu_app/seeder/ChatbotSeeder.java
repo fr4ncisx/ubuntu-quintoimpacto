@@ -149,7 +149,7 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 ),
                                 new ChatbotResponseEntity(null, "Perfecto! Un placer ayudarte", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "gracias por todo", null),
-                                new ChatbotQuestionEntity(null, "gracias por hoy", null))
+                                new ChatbotQuestionEntity(null, "gracias", null))
                                 ),
                                 new ChatbotResponseEntity(null, "Para cerrar esta ventana de chat solo presiona en donde dice CERRAR", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "salir", null),
