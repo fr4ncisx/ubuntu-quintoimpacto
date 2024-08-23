@@ -52,7 +52,8 @@ public class JWTUtils {
             .withClaim("apellido", user.getApellido())
             .withClaim("telefono", user.getTelefono())
             .withClaim("rol", user.getRol().name())
-            .withClaim("imagen", user.getImagen())   
+            .withClaim("imagen", user.getImagen()) 
+            .withClaim("newsletter", user.getSuscribed())   
             .withClaim("vencimiento", LocalDateTime.ofInstant(expirationTime(expirationTime), ZoneId.systemDefault())
             .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")).toString())         
             .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());

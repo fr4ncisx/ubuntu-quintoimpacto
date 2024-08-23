@@ -34,14 +34,14 @@ public class UserService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
     }
     
-    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, Long id) {
-        Optional<UserEntity> userObtained = userRepository.findById(id);
-        if (userObtained.isPresent()) {
-            userObtained.get().editUser(userDto);
-            var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
-            return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
+    public ResponseEntity<?> updateUser(UserUpdateDTO userDto, String email) {
+        Optional<UserEntity> userObtained = userRepository.findByEmail(email);
+        if (!userObtained.isPresent()) {
+            throw new SqlEmptyResponse("El usuario no existe en la base de datos");
         }
-        throw new SqlEmptyResponse("El usuario no existe en la base de datos");
+        userObtained.get().editUser(userDto);
+        var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
+        return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<?> deactivateUser(Long idUserToDeactivate) {

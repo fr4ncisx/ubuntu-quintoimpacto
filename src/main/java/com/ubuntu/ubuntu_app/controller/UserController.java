@@ -53,8 +53,8 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = "Fallo al ingresar datos por campos vacios", content = @Content(schema = @Schema(defaultValue = UserResponseDoc.user_validation_error)))
         @ApiResponse(responseCode = "404", description = "El usuario no existe en la base de datos", content = @Content(schema = @Schema(defaultValue = UserResponseDoc.user_not_found)))
         @PutMapping("/update")
-        public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateDTO userUpdate, @RequestParam Long id) {
-                return userService.updateUser(userUpdate, id);
+        public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateDTO userUpdate, @RequestParam String email) {
+                return userService.updateUser(userUpdate, email);
         }
 
         @Operation(summary = "Buscar todos los usuarios", security = @SecurityRequirement(name = "bearer-key"))
