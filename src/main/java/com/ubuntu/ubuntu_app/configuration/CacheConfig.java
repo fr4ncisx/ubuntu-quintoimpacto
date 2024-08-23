@@ -6,11 +6,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-
 import java.util.concurrent.TimeUnit;
 
-@Lazy
 @EnableCaching
 @Configuration
 public class CacheConfig {
@@ -19,8 +16,8 @@ public class CacheConfig {
     CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .maximumSize(100)
-                .expireAfterWrite(10, TimeUnit.MINUTES));
+                .maximumSize(50)
+                .expireAfterWrite(5, TimeUnit.MINUTES));
         return cacheManager;
     }
 }
