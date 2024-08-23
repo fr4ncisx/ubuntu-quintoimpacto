@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+       
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Estos son los  Microemprendimientos nuevos en la plataforma :
+    </title>
+</head>
+<body>
+    <h2>Noticias sobre Ubuntu :</h2>
+    <div th:if="${micros == null or micros.isEmpty()}">
+        <p>No hubo Microemprendimientos nuevos en la plataforma</p>
+    </div>
+    <div th:unless="${micros == null or micros.isEmpty()}">
+        <h2>Los Microemprendimientos nuevos son los siguientes </h2>
+        <div th:each="micro : ${micros}" >
+                <strong>Nombre:</strong> <span th:text="${micro.nombre}">Nombre del Negocio</span> <br>
+                <strong>Pais:</strong> <span th:text="${micro.pais}">Pais</span><br>
+                <strong>Provincia:</strong> <span th:text="${micro.provincia}">provincia</span><br>
+                <strong>Ciudad:</strong> <span th:text="${micro.ciudad}">ciudad</span><br>
+                <strong>Descripcion:</strong> <span th:text="${micro.descripcion}">descripcion</span><br>
+                <strong>Categoria:</strong> <span th:text="${micro.categoria.nombre}">categoria</span><br>
+                <hr>
+        </div>
+    </div>
+</body>
+</html>
