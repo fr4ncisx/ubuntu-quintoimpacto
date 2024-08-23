@@ -130,8 +130,11 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 ),
                                 new ChatbotResponseEntity(null, "Si necesitás contactar un administrador puedes hacerlo al siguiente correo: semilleroubuntu.dev@gmail.com", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "admin", null),
-                                new ChatbotQuestionEntity(null, "ubuntu", null),
                                 new ChatbotQuestionEntity(null, "administrador", null))
+                                ),
+                                new ChatbotResponseEntity(null, "Ubuntu es una empresa de financiamiento sostenible, de grupo asociativo, compuesta por 30 personas, originaria de Mendoza, Argentina.", Arrays.asList(
+                                new ChatbotQuestionEntity(null, "que es ubuntu", null),
+                                new ChatbotQuestionEntity(null, "ubuntu", null))
                                 ),
                                 new ChatbotResponseEntity(null, "De nada es un placer ayudarte para eso estamos!, puedes continuar con tu estancia o preguntarme lo que quieras", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "gracias", null),
@@ -145,8 +148,8 @@ public class ChatbotSeeder implements CommandLineRunner {
                                 new ChatbotQuestionEntity(null, "conquista america", null))
                                 ),
                                 new ChatbotResponseEntity(null, "Perfecto! Un placer ayudarte", Arrays.asList(
-                                new ChatbotQuestionEntity(null, "todo", null),
-                                new ChatbotQuestionEntity(null, "por hoy", null))
+                                new ChatbotQuestionEntity(null, "gracias por todo", null),
+                                new ChatbotQuestionEntity(null, "gracias por hoy", null))
                                 ),
                                 new ChatbotResponseEntity(null, "Para cerrar esta ventana de chat solo presiona en donde dice CERRAR", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "salir", null),
