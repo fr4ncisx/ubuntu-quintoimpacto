@@ -4,7 +4,6 @@ import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,7 +15,6 @@ import org.thymeleaf.context.Context;
 import java.time.LocalDate;
 import java.util.List;
 
-@Lazy
 @EnableScheduling
 @Service
 public class MailService {
@@ -34,7 +32,7 @@ public class MailService {
     private TemplateEngine templateEngine;
 
     @Transactional    
-    @Scheduled(cron = "0 0 22 ? * FRI") //  https://crontab.cronhub.io/ Generador de expresion Cron
+    @Scheduled(cron = "0 0 21 ? * FRI") //  https://crontab.cronhub.io/ Generador de expresion Cron
     public void prepareNewsMicroBussinessToSend() throws MessagingException {
         List<MicrobusinessDTO> micros = microbusinessService.microsNotSent();
         String[] admins = userService.findAllEmails();

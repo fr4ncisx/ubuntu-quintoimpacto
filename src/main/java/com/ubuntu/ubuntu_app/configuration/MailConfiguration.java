@@ -3,13 +3,11 @@ package com.ubuntu.ubuntu_app.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
-@Lazy
 @Configuration
 public class MailConfiguration {
     @Value("${email.sender}")
@@ -30,7 +28,7 @@ public class MailConfiguration {
         props.put("mail.transport.protocol","smtp");
         props.put("mail.smtp.auth","true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug","false");
+        props.put("mail.debug","true");
 
         return mailSender;
     }
