@@ -32,7 +32,7 @@ public class StopWords {
     "trabajo", "tras", "tú", "tu", "tus", "tuya", "tuyo", "tuyos", "un", "una", "uno", "unos", "usa",
     "usais", "usamos", "usan", "usar", "usas", "uso", "usted", "ustedes", "va", "vais", "valor", "vamos",
     "van", "vaya", "verdad", "verdadera", "verdadero", "vosotras", "vosotros", "voy", "vuestra",
-    "vuestras", "vuestro", "vuestros", "y", "ya", "yo", "?", "¿", "!", "¡", "*"));
+    "vuestras", "vuestro", "vuestros", "y", "ya", "yo"));
     
     public static Set<String> getLatinAmericanSpanishStopWords() {
         return LATIN_AMERICAN_SPANISH_STOP_WORDS;

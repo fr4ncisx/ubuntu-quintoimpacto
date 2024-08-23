@@ -51,14 +51,15 @@ public class ChatBotService {
     }
 
     public ResponseEntity<?> obtainQuestions(String category) {
-        if(category.isBlank()){
+        if (category.isBlank()) {
             throw new IllegalParameterException("Please write a category to search questions");
         }
         var questionsFound = chatbotQuestionsRepository.obtainQuestions(category);
         if (questionsFound.isEmpty()) {
             throw new SqlEmptyResponse("No questions found");
         }
-        var questionsDTO = questionsFound.stream().map(q -> MapperConverter.generate().map(q, ChatbotCategoriesDTO.class)).toList();
+        var questionsDTO = questionsFound.stream()
+                .map(q -> MapperConverter.generate().map(q, ChatbotCategoriesDTO.class)).toList();
         return ResponseEntity.ok(questionsDTO);
     }
 
@@ -73,7 +74,7 @@ public class ChatBotService {
         if (!foundAnswer.isPresent()) {
             throw new SqlEmptyResponse("There are no answers with that foreign key");
         }
-        if(foundAnswer.get().getAnswer().equalsIgnoreCase("Respuesta categorias")){
+        if (foundAnswer.get().getAnswer().equalsIgnoreCase("Respuesta categorias")) {
             return ResponseEntity.ok(ResponseMap.MultiBotResponse(ResponseCategories.response));
         }
         return ResponseEntity.ok(ResponseMap.botResponse(foundAnswer.get().getAnswer()));
@@ -99,8 +100,7 @@ public class ChatBotService {
         }
         debugChatBot.clear();
         var faqsFiltered = faqs.stream()
-                .filter(f -> f.getPossibleQuestions().stream()
-                        .allMatch(q -> q.getCategory() == null))
+                .filter(f -> f.getPossibleQuestions().stream().allMatch(q -> q.getCategory() == null))
                 .collect(Collectors.toList());
         for (ChatbotResponseEntity faq : faqsFiltered) {
             for (ChatbotQuestionEntity questionEntity : faq.getPossibleQuestions()) {
@@ -117,8 +117,8 @@ public class ChatBotService {
             logMatchResult(bestMatch.get());
             var answerObtained = bestMatch.get().response();
             var similarityScore = bestMatch.get().similarityScore();
-            return ResponseEntity.ok(ResponseMap.responseGeneric("Respuesta",
-                    new BotResponse(answerObtained, similarityScore)));
+            return ResponseEntity
+                    .ok(ResponseMap.responseGeneric("Respuesta", new BotResponse(answerObtained, similarityScore)));
         } else {
             logNoMatchFound();
             return ResponseEntity.ok(ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta."));
@@ -201,10 +201,10 @@ public class ChatBotService {
 
             CharTermAttribute charTermAttribute = filteredTokenStream.addAttribute(CharTermAttribute.class);
             filteredTokenStream.reset();
-
             StringBuilder result = new StringBuilder();
             while (filteredTokenStream.incrementToken()) {
-                String term = charTermAttribute.toString();
+                String term = charTermAttribute.toString().toLowerCase();
+                term = term.replaceAll("[¿?!*]", "");
                 if (!isStopWord(term)) {
                     result.append(term).append(' ');
                 }
