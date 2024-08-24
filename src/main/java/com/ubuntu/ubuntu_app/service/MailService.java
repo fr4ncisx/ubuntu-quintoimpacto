@@ -36,7 +36,7 @@ public class MailService {
     public void prepareNewsMicroBussinessToSend() throws MessagingException {
         List<MicrobusinessDTO> micros = microbusinessService.microsNotSent();
         String[] admins = userService.findAllEmails();
-        sendNewMicroBusinessToAdmins(admins, "informe Semanal ubuntu", micros);
+        sendNewMicroBusinessToAdmins(admins, "Informe Semanal Ubuntu", micros);
     }
 
     public void sendNewMicroBusinessToAdmins(String[] to, String subject, List<MicrobusinessDTO> micros) throws MessagingException {
