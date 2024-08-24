@@ -32,7 +32,7 @@ public class MailService {
     private TemplateEngine templateEngine;
 
     @Transactional    
-    @Scheduled(cron = "0 0 21 ? * FRI") //  https://crontab.cronhub.io/ Generador de expresion Cron
+    @Scheduled(cron = "*/5 * * * *") //  https://crontab.cronhub.io/ Generador de expresion Cron
     public void prepareNewsMicroBussinessToSend() throws MessagingException {
         List<MicrobusinessDTO> micros = microbusinessService.microsNotSent();
         String[] admins = userService.findAllEmails();
