@@ -71,9 +71,10 @@ public class SecurityConfig {
                     // TODO: Chatbot
                     authRequest.requestMatchers("/chatbot/**").permitAll();
                     // TODO: Bugs
+                    authRequest.requestMatchers("/bug/resolved").permitAll();
+                    authRequest.requestMatchers("/bug/create").permitAll();
                     authRequest.requestMatchers("/bug/find").permitAll();
-                    authRequest.requestMatchers("/bug/fixed").permitAll();                    
-                    authRequest.requestMatchers("/bug/admin/**").permitAll();
+                    authRequest.requestMatchers("/bug/fixed").permitAll();
                     // TODO: Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
                             "/swagger-ui/**").permitAll();

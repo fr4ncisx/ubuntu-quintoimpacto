@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,18 +32,13 @@ public class BugController {
     public ResponseEntity<?> getFixedBugs() {
         return bugService.getFixedBugs();
     }
-    @Transactional(readOnly = false)
-    @PostMapping("/admin/create")
+
+    @PostMapping("/create")
     public ResponseEntity<?> newBug(@Valid @RequestBody BugDTO bugDTO) {
         return bugService.createBug(bugDTO);
     }
-    /*@Transactional(readOnly = false)
-    @DeleteMapping("/admin/delete")
-    public ResponseEntity<?> deleteBug() {
-        return bugService.deleteBug();
-    }*/
-    @Transactional(readOnly = false)
-    @PutMapping("/admin/hide")
+
+    @PutMapping("/resolved")
     public ResponseEntity<?> fixedBug(@RequestParam Long id) {
         return bugService.updateBugStatus(id);
     }

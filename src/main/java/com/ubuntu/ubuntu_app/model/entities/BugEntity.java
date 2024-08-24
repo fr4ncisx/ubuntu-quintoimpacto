@@ -29,6 +29,7 @@ public class BugEntity {
     private String description;
     private String category;
     private LocalDate date;
+    private LocalDate fixedDate;
     private boolean fixed;
     
     public BugEntity(BugDTO bugDTO) {

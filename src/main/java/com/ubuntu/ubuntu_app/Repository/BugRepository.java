@@ -11,5 +11,5 @@ import com.ubuntu.ubuntu_app.model.entities.BugEntity;
 public interface BugRepository extends JpaRepository<BugEntity, Long>{
     
     List<BugEntity> findByFixedFalseOrderByDateAsc();
-    List<BugEntity> findByFixedTrueOrderByIdAsc();
+    List<BugEntity> findByFixedTrueOrderByFixedDateDesc();
 }
