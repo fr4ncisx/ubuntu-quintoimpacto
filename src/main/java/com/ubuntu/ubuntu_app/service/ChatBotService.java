@@ -5,8 +5,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.es.SpanishLightStemFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -34,7 +32,6 @@ import java.util.stream.Collectors;
 @Service
 public class ChatBotService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChatBotService.class);
     private final CosineSimilarity cosineSimilarity;
     private final ChatbotRepository chatbotRepository;
     private final ChatbotQuestionsRepository chatbotQuestionsRepository;
@@ -94,7 +91,6 @@ public class ChatBotService {
         try {
             faqs = chatbotRepository.findAll();
         } catch (Exception e) {
-            logger.error("Error fetching FAQs from repository", e);
             return ResponseEntity.internalServerError()
                     .body(ResponseMap.botResponse("An error occurred while processing your request."));
         }
@@ -114,44 +110,12 @@ public class ChatBotService {
                 .max(Comparator.comparing(InnerChatBotService::similarityScore));
 
         if (bestMatch.isPresent()) {
-            logMatchResult(bestMatch.get());
             var answerObtained = bestMatch.get().response();
             var similarityScore = bestMatch.get().similarityScore();
             return ResponseEntity
                     .ok(ResponseMap.responseGeneric("Respuesta", new BotResponse(answerObtained, similarityScore)));
         } else {
-            logNoMatchFound();
             return ResponseEntity.ok(ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta."));
-        }
-    }
-
-    /**
-     * This is only testing purposes to see how accurate was the score
-     * 
-     * @param match
-     */
-    private void logMatchResult(InnerChatBotService match) {
-        if (match.similarityScore() == 1) {
-            logger.info("Perfect user question found! Similarity Score = {}", match.similarityScore());
-        } else {
-            logger.info("This is the most accurate question found. Similarity Score = {}", match.similarityScore());
-        }
-    }
-
-    /**
-     * This log is just to verify that no match was found
-     * 
-     * @param match
-     */
-    private void logNoMatchFound() {
-        Optional<InnerChatBotService> worstMatch = debugChatBot.stream()
-                .filter(result -> result.similarityScore() < similarityThreshold)
-                .max(Comparator.comparing(InnerChatBotService::similarityScore));
-
-        if (worstMatch.isPresent()) {
-            logger.info("No match found! Similarity Score = {}", worstMatch.get().similarityScore());
-        } else {
-            logger.info("No responses available.");
         }
     }
 
@@ -166,7 +130,6 @@ public class ChatBotService {
         Map<CharSequence, Integer> vector1 = toVector(question1);
         Map<CharSequence, Integer> vector2 = toVector(question2);
         double similarity = cosineSimilarity.cosineSimilarity(vector1, vector2);
-        logger.debug("Similarity between '{}' and '{}' = {}", question1, question2, similarity);
         return similarity;
     }
 
@@ -213,7 +176,6 @@ public class ChatBotService {
 
             return result.length() > 0 ? result.substring(0, result.length() - 1).toLowerCase() : "";
         } catch (IOException e) {
-            logger.error("Error preprocessing text: {}", question, e);
             return question.toLowerCase().trim();
         }
     }
