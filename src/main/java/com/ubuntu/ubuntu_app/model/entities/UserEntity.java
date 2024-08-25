@@ -5,7 +5,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
 import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.dto.UserUpdateDTO;
@@ -91,9 +90,7 @@ public class UserEntity implements UserDetails {
             nombre = userDto.getNombre();     
             apellido = userDto.getApellido();       
             telefono = userDto.getTelefono();
-            if(userDto.isSuscribed() == getSuscribed()){
-                throw new IllegalParameterException("No se puede cambiar el estado de suscripción porque es el mismo");
-            }
+            suscribed = userDto.isSuscribed();
             this.imagen = userDto.getImagen();
             suscribed = userDto.isSuscribed();
     }
