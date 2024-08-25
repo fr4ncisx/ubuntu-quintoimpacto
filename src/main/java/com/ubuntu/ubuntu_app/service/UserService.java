@@ -43,7 +43,11 @@ public class UserService {
             throw new SqlEmptyResponse("El usuario no existe en la base de datos");
         }
         if(userObtained.get().getSuscribed() == userDto.isSuscribed()){
-            throw new IllegalParameterException("User is already unsuscribed");
+            if(userObtained.get().getSuscribed()){
+                throw new IllegalParameterException("User is already suscribed from newsletter");
+            } else {
+                throw new IllegalParameterException("User is already unsuscribed from newsletter");
+            }            
         }
         userObtained.get().editUser(userDto);
         var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
