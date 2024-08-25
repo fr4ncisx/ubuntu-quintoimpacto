@@ -100,7 +100,7 @@ public class GlobalErrorHandler {
     public ResponseEntity<?> nullTokenException(IllegalParameterException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMensaje());
-        return new ResponseEntity<>(errors, HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
