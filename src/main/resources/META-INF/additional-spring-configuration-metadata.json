@@ -38,5 +38,15 @@
     "name": "token.expiration",
     "type": "java.lang.String",
     "description": "A description for 'token.expiration'"
+  },
+  {
+    "name": "cors.local",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.local'"
+  },
+  {
+    "name": "cors.vercel",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.vercel'"
   }
 ]}
