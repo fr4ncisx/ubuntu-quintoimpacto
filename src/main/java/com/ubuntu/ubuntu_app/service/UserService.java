@@ -2,7 +2,6 @@ package com.ubuntu.ubuntu_app.service;
 
 import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
-import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
@@ -41,13 +40,6 @@ public class UserService {
         Optional<UserEntity> userObtained = userRepository.findByEmail(email);
         if (!userObtained.isPresent()) {
             throw new SqlEmptyResponse("El usuario no existe en la base de datos");
-        }
-        if(userObtained.get().getSuscribed() == userDto.isSuscribed()){
-            if(userObtained.get().getSuscribed()){
-                throw new IllegalParameterException("User is already suscribed from newsletter");
-            } else {
-                throw new IllegalParameterException("User is already unsuscribed from newsletter");
-            }            
         }
         userObtained.get().editUser(userDto);
         var jsonResponse = ResponseMap.createResponse("Usuario Modificado exitosamente");
