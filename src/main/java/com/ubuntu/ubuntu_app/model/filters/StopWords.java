@@ -11,7 +11,7 @@ public class StopWords {
     "bastante", "cabe", "cada", "casi", "cierto", "con", "conmigo", "conseguimos",
     "conseguir", "consigo", "consigue", "consiguen", "consigues", "contigo", "contra", "cual", "cuales",
     "cualquier", "cualquiera", "cuan", "cuando", "cuanto", "cuanta", "cuantas", "cuantos", "de", "dejar",
-    "del", "demás", "demasiado", "dentro", "desde", "dos", "durante", "el", "él", "ella",
+    "del", "demás", "demasiado", "dentro", "desde", "dos", "donde", "durante", "el", "él", "ella",
     "ellas", "ello", "ellos", "empleais", "emplean", "emplear", "empleas", "empleo", "en", "encima",
     "entonces", "entre", "era", "eramos", "eran", "eras", "eres", "es", "esa", "esas", "ese", "eso",
     "esos", "estaba", "estado", "estais", "estamos", "estan", "estar", "este", "esto", "estos",
