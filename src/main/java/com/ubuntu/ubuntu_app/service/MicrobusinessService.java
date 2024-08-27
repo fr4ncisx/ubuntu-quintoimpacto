@@ -126,7 +126,7 @@ public class MicrobusinessService {
     }
 
     public ResponseEntity<?> getAllMicro() {
-        var microSearch = microbusinessRepository.findByActivoTrueOrderByDateDesc();
+        var microSearch = microbusinessRepository.findByActivoTrueOrderByFechaDesc();
         if (microSearch.isEmpty()) {
             throw new SqlEmptyResponse("No se encontaron emprendimientos en la base de datos");
         }
@@ -166,7 +166,7 @@ public class MicrobusinessService {
 
     public ResponseEntity<?> findAllMicroByActive(boolean active) {
         if (active) {
-            var listOfActiveMicros = microbusinessRepository.findByActivoTrueOrderByDateDesc();
+            var listOfActiveMicros = microbusinessRepository.findByActivoTrueOrderByFechaDesc();
             if (listOfActiveMicros.isEmpty()) {
                 throw new SqlEmptyResponse("No micro found");
             }
@@ -174,7 +174,7 @@ public class MicrobusinessService {
                     .map(a -> MapperConverter.generate().map(a, MicrobusinessSearchbarDTO.class)).toList();
             return ResponseEntity.ok(response);
         } else {
-            var listOfInactiveMicros = microbusinessRepository.findByActivoFalseOrderByDateDesc();
+            var listOfInactiveMicros = microbusinessRepository.findByActivoFalseOrderByFechaDesc();
             if (listOfInactiveMicros.isEmpty()) {
                 throw new SqlEmptyResponse("No micro found");
             }
