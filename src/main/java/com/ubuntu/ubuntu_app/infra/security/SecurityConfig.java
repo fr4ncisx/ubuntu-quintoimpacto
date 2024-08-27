@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authRequest -> {
                     // TODO: Usuarios
-                    authRequest.requestMatchers("/user/update").hasRole("ADMIN");
+                    authRequest.requestMatchers("/user/update").hasAnyRole("ADMIN","USER");
                     authRequest.requestMatchers("/user/deactivate").hasRole("ADMIN");
                     authRequest.requestMatchers("/user/fetch").hasRole("ADMIN");
                     authRequest.requestMatchers("/user/register").hasRole("ADMIN");
