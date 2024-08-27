@@ -1,6 +1,7 @@
 package com.ubuntu.ubuntu_app.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,9 +42,10 @@ public class PublicationController {
         return publicationService.findById(id);
     }
 
-    @PutMapping("/disable")
-    public ResponseEntity<?> disablePublication(@RequestParam Long id) {
-        return publicationService.disablePublication(id);
+    @Operation(summary = "Desactivar publicaciones o Reactivarlas", description = "Ingresar como parámetro el id de la publicacion y enable=true(activar), enable=false(desactivar)")
+    @PutMapping("/hide")
+    public ResponseEntity<?> disablePublication(@RequestParam Long id, @RequestParam boolean enable) {
+        return publicationService.hideOrEnablePublication(id, enable);
     }
 
     @PutMapping("/click")
@@ -66,4 +68,10 @@ public class PublicationController {
     public ResponseEntity<?> searchPublication(@RequestParam String publication) {
             return publicationService.findPublication(publication);
     }
+
+    @Operation(summary = "Eliminar publicación", description = "Ingresar parametro id con el id de la publicación respectiva")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deletePublication(@RequestParam Long id) {
+        return publicationService.delete(id);
+}
 }

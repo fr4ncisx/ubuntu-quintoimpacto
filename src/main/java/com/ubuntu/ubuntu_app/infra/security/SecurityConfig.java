@@ -42,7 +42,7 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/publications/create").hasRole("ADMIN");
                     authRequest.requestMatchers("/publications/statistics").hasRole("ADMIN");
                     authRequest.requestMatchers("/publications/edit").hasRole("ADMIN");
-                    authRequest.requestMatchers("/publications/disable").hasRole("ADMIN");
+                    authRequest.requestMatchers("/publications/hide").hasRole("ADMIN");
                     // TODO: Microemprendimientos
                     authRequest.requestMatchers("/micro/find").permitAll();
                     authRequest.requestMatchers("/micro/find/category").permitAll();

@@ -16,7 +16,6 @@ import com.ubuntu.ubuntu_app.Repository.PublicationViewRepository;
 import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
-import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.PublicationDTO;
@@ -74,13 +73,15 @@ public class PublicationService {
     }
 
     @Transactional
-    public ResponseEntity<?> disablePublication(Long id) {
+    public ResponseEntity<?> hideOrEnablePublication(Long id, boolean enable) {
         var publicationFound = publicationFinder(id);
-        if (!publicationFound.isActive()) {
-            throw new IllegalRewriteException("Publication is already hidden");
-        }
-        publicationFound.setActive(false);
-        return ResponseEntity.ok(ResponseMap.createResponse("Hidden publication sucessfully"));
+        if(enable){
+            publicationFound.setActive(true);
+            return ResponseEntity.ok(ResponseMap.createResponse("Publication reactivated"));
+        } else {
+            publicationFound.setActive(false);
+            return ResponseEntity.ok(ResponseMap.createResponse("Hidden publication sucessfully"));
+        }        
     }
 
     @Transactional
@@ -182,5 +183,18 @@ public class PublicationService {
         var responseDTO = listOfPublications.stream()
                 .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<?> delete(Long id) {
+        if (id == 0) {
+            throw new IllegalParameterException("Not acceptable value id zero");
+        }
+        var optionalPublication = publicationRepository.findById(id);
+        if (!optionalPublication.isPresent()) {
+            throw new SqlEmptyResponse("Publication not found");
+        }
+        publicationRepository.delete(optionalPublication.get());
+        return ResponseEntity.ok(ResponseMap.createResponse("Publication deleted"));
     }
 }
