@@ -101,6 +101,7 @@ public class MicrobussinesController {
                 return microbusinessService.findAllMicroCategoriesCurrentMonth();
         }
 
+        @Operation(summary = "Buscar microemprendimientos por activos o inactivos", description = "Ingresar parametro active=true (Busca emprendimientos activos), active=false (Busca emprendimientos inactivos)")
         @GetMapping("/api/findBy")
         public ResponseEntity<?> findAllMicroActiveOrInactive(@RequestParam boolean active) {
                 return microbusinessService.findAllMicroByActive(active);
