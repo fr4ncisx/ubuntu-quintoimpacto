@@ -91,25 +91,25 @@ public class PublicationService {
         return ResponseEntity.ok(ResponseMap.createResponse("Added new visualization"));
     }
 
-    public ResponseEntity<?> findAllActiveRecentPublications() {
-        var listOfPublications = publicationRepository.findAllByActiveTrueOrderByDateDesc();
-        if (listOfPublications.isEmpty()) {
-            throw new SqlEmptyResponse("No publications found");
-        }
-        var responseDTO = listOfPublications.stream()
-                .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
+    // public ResponseEntity<?> findAllActiveRecentPublications() {
+    //     var listOfPublications = publicationRepository.findAllByActiveTrueOrderByDateDesc();
+    //     if (listOfPublications.isEmpty()) {
+    //         throw new SqlEmptyResponse("No publications found");
+    //     }
+    //     var responseDTO = listOfPublications.stream()
+    //             .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
+    //     return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    // }
 
-    public ResponseEntity<?> findAll() {
-        var listOfPublications = publicationRepository.findAll();
-        if (listOfPublications.isEmpty()) {
-            throw new SqlEmptyResponse("No publications found");
-        }
-        var responseDTO = listOfPublications.stream()
-                .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
+    // public ResponseEntity<?> findAll() {
+    //     var listOfPublications = publicationRepository.findAll();
+    //     if (listOfPublications.isEmpty()) {
+    //         throw new SqlEmptyResponse("No publications found");
+    //     }
+    //     var responseDTO = listOfPublications.stream()
+    //             .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
+    //     return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    // }
 
     public ResponseEntity<?> getStatistics(Long limitSize) {
         List<PublicationStatisticsDTO> statistics = new ArrayList<>();
@@ -128,8 +128,7 @@ public class PublicationService {
                     new PublicationStatisticsDTO(publicationEntity.getTitle(), publicationEntity.getDate(), count));
         }
         var sortedStatistics = statistics.stream()
-                .sorted(Comparator.comparing(PublicationStatisticsDTO::getVisualizations).reversed())
-                .limit(limitSize)
+                .sorted(Comparator.comparing(PublicationStatisticsDTO::getVisualizations).reversed()).limit(limitSize)
                 .toList();
         if (sortedStatistics.isEmpty()) {
             throw new SqlEmptyResponse("No publications at current month/year");
@@ -147,20 +146,41 @@ public class PublicationService {
     }
 
     public ResponseEntity<?> findPublication(String publication) {
-        if(publication.isBlank() || publication == null){
+        if (publication.isBlank() || publication == null) {
             throw new IllegalParameterException("Input is required");
         }
-        var searchNormalized = publicationRepository.findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
-        if(searchNormalized.isEmpty()){
+        var searchNormalized = publicationRepository
+                .findByTitleLikeAndActiveTrue(StringFilter.getNormalizedInput(publication));
+        if (searchNormalized.isEmpty()) {
             var searchWithLowerCase = publicationRepository.findByTitleLikeAndActiveTrue(publication.toLowerCase());
-            if(searchNormalized.isEmpty()){
+            if (searchNormalized.isEmpty()) {
                 throw new SqlEmptyResponse("No publications match with that word");
             } else {
-                var responseLowerCase = searchWithLowerCase.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+                var responseLowerCase = searchWithLowerCase.stream()
+                        .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
                 return ResponseEntity.ok(responseLowerCase);
             }
         }
-        var responseDTO = searchNormalized.stream().map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+        var responseDTO = searchNormalized.stream()
+                .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
         return ResponseEntity.ok(responseDTO);
+    }
+
+    public ResponseEntity<?> findAllPublications(boolean active) {
+        if (active) {
+            return findPublications(publicationRepository.findAllByActiveTrueOrderByDateDesc());
+        } else {
+            return findPublications(publicationRepository.findAllByActiveFalseOrderByDateDesc());
+        }
+    }
+
+    private ResponseEntity<?> findPublications(List<PublicationEntity> GenericListOfActiveOrInactive) {
+        var listOfPublications = GenericListOfActiveOrInactive;
+        if (listOfPublications.isEmpty()) {
+            throw new SqlEmptyResponse("No publications found");
+        }
+        var responseDTO = listOfPublications.stream()
+                .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }

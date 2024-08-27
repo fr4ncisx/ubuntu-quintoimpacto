@@ -56,12 +56,8 @@ public class PublicationController {
     }
 
     @GetMapping("/find-all")
-    public ResponseEntity<?> findAllPublicationsOrdered(@RequestParam boolean ordered) {
-        if (ordered) {
-            return publicationService.findAllActiveRecentPublications();
-        } else {
-            return publicationService.findAll();
-        }
+    public ResponseEntity<?> findAllPublicationsOrdered(@RequestParam boolean active) {
+            return publicationService.findAllPublications(active);
     }
 
     @GetMapping("/search")
