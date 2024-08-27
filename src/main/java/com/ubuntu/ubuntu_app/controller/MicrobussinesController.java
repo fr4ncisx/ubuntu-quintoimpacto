@@ -63,7 +63,7 @@ public class MicrobussinesController {
 
         @ApiResponse(responseCode = "200", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_hide_ok)))
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_not_found_one)))
-        @Operation(summary = "Ocultar emprendimiento")
+        @Operation(summary = "Activar o desactivar microemprendimientos", description = "Ingresar parametro enable=true (Activa microemprendimiento), enable=false (Desactiva microemprendimiento)")
         @Transactional(readOnly = false)
         @PutMapping("/hide")
         public ResponseEntity<?> hideMicroBussiness(@RequestParam Long id, @RequestParam boolean enable) {

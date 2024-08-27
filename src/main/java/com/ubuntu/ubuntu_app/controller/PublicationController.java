@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ubuntu.ubuntu_app.model.dto.PublicationRequestDTO;
 import com.ubuntu.ubuntu_app.service.PublicationService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,7 @@ public class PublicationController {
         return publicationService.getStatistics(limitSize);
     }
 
+    @Operation(summary = "Buscar publicaciones activas o inactivas", description = "Ingresar parametro active=true (Publicaciones activas), active=false (Publicaciones inactivas)")
     @GetMapping("/find-all")
     public ResponseEntity<?> findAllPublicationsOrdered(@RequestParam boolean active) {
             return publicationService.findAllPublications(active);
