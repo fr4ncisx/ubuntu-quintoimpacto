@@ -48,5 +48,15 @@
     "name": "cors.vercel",
     "type": "java.lang.String",
     "description": "A description for 'cors.vercel'"
+  },
+  {
+    "name": "nominatim.search",
+    "type": "java.lang.String",
+    "description": "A description for 'nominatim.search'"
+  },
+  {
+    "name": "nominatim.reverse",
+    "type": "java.lang.String",
+    "description": "A description for 'nominatim.reverse'"
   }
 ]}
