@@ -66,8 +66,8 @@ public class MicrobussinesController {
         @Operation(summary = "Ocultar emprendimiento")
         @Transactional(readOnly = false)
         @PutMapping("/hide")
-        public ResponseEntity<?> hideMicroBussiness(@RequestParam Long id) {
-                return microbusinessService.hideMicro(id);
+        public ResponseEntity<?> hideMicroBussiness(@RequestParam Long id, @RequestParam boolean enable) {
+                return microbusinessService.hideMicro(id, enable);
         }
 
         @ApiResponse(responseCode = "200", description = "Respuesta operación válida", content = @Content(schema = @Schema(defaultValue = MicroResponseDoc.micro_deleted)))
@@ -99,5 +99,10 @@ public class MicrobussinesController {
         @GetMapping("/api/statistics/micro-category")
         public ResponseEntity<?> getMicroByCategoryMonth() {
                 return microbusinessService.findAllMicroCategoriesCurrentMonth();
+        }
+
+        @GetMapping("/api/findBy")
+        public ResponseEntity<?> findAllMicroActiveOrInactive(@RequestParam boolean active) {
+                return microbusinessService.findAllMicroByActive(active);
         }
 }

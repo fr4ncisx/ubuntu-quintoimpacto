@@ -48,7 +48,8 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/micro/find/category").permitAll();
                     authRequest.requestMatchers("/micro/api/find-all").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/api/statistics/micro").hasRole("ADMIN");
-                    authRequest.requestMatchers("/micro/api/statistics/micro-category").hasRole("ADMIN");
+                    authRequest.requestMatchers("/micro/api/statistics/micro-category").hasRole("ADMIN");                    
+                    authRequest.requestMatchers("/api/findBy").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/edit").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/delete").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/hide").hasRole("ADMIN");

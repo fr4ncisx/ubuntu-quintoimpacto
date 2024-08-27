@@ -17,7 +17,9 @@ public interface MicrobusinessRepository extends JpaRepository<MicrobusinessEnti
     @Query(value = "SELECT m FROM MicrobusinessEntity m WHERE m.activo = true AND m.categoria.id = (SELECT c.id FROM CategoryEntity c WHERE c.nombre = :category)")
     List<MicrobusinessEntity> findAllActive(String category);
 
-    List<MicrobusinessEntity> findByActivoTrue();
+    List<MicrobusinessEntity> findByActivoTrueOrderByDateDesc();
+
+    List<MicrobusinessEntity> findByActivoFalseOrderByDateDesc();
 
     @Query(value = "SELECT COUNT(id) FROM microemprendimientos WHERE activo= true AND EXTRACT(YEAR FROM fecha_creacion) = :year AND EXTRACT(MONTH FROM fecha_creacion) = :month", nativeQuery = true)
     Long findByStatistics(int month, int year);
