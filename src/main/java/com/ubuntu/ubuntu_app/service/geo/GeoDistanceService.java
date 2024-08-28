@@ -2,7 +2,6 @@ package com.ubuntu.ubuntu_app.service.geo;
 
 import java.text.DecimalFormat;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,7 +26,6 @@ public class GeoDistanceService {
         return cleanDecimalFormat(total, "#.##");
     }
 
-    @Cacheable(value = "coordinatesCache", key = "#city + ',' + #country")
     public Nominatim getCoordinatesByName(String city, String country) {
         RestTemplate restTemplate = new RestTemplate();
         String url = UriComponentsBuilder

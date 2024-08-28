@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -201,6 +202,7 @@ public class MicrobusinessService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
+    @Cacheable(value = "coordinatesCache", key = "#lat + ',' + #lon")
     public ResponseEntity<?> getNearMicro(double lat, double lon) {
         var listOfMicro = microbusinessRepository.findByActivoTrueOrderByFechaDesc();
         if (listOfMicro.isEmpty()) {
