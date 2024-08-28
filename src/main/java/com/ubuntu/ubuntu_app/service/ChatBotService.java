@@ -5,6 +5,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.es.SpanishLightStemFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.ubuntu.ubuntu_app.Repository.ChatbotQuestionsRepository;
 import com.ubuntu.ubuntu_app.Repository.ChatbotRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
@@ -35,16 +35,18 @@ public class ChatBotService {
     private final CosineSimilarity cosineSimilarity;
     private final ChatbotRepository chatbotRepository;
     private final ChatbotQuestionsRepository chatbotQuestionsRepository;
+    private final ModelMapper modelMapper;
     private final List<InnerChatBotService> debugChatBot = new ArrayList<>();
 
     @Value("${chatbot.similarity.threshold:0.5}")
     private double similarityThreshold;
 
     public ChatBotService(ChatbotRepository chatbotRepository, CosineSimilarity cosineSimilarity,
-            ChatbotQuestionsRepository chatbotQuestionsRepository) {
+            ChatbotQuestionsRepository chatbotQuestionsRepository, ModelMapper modelMapper) {
         this.chatbotRepository = chatbotRepository;
         this.cosineSimilarity = cosineSimilarity;
         this.chatbotQuestionsRepository = chatbotQuestionsRepository;
+        this.modelMapper = modelMapper;
     }
 
     public ResponseEntity<?> obtainQuestions(String category) {
@@ -56,7 +58,7 @@ public class ChatBotService {
             throw new SqlEmptyResponse("No questions found");
         }
         var questionsDTO = questionsFound.stream()
-                .map(q -> MapperConverter.generate().map(q, ChatbotCategoriesDTO.class)).toList();
+                .map(q -> modelMapper.map(q, ChatbotCategoriesDTO.class)).toList();
         return ResponseEntity.ok(questionsDTO);
     }
 

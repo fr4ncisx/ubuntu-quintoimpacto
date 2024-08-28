@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.EmptyFieldException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
@@ -44,7 +44,7 @@ public class MicrobusinessService {
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
     private final GeoDistanceService geoDistanceService;
-    //private final GeoLocationService geoLocationService;
+    private final ModelMapper modelMapper;
 
     public ResponseEntity<?> create(MicrobusinessDTO microbusinessDTO) {
         Optional<CategoryEntity> categoryOptional = categoryRepository
@@ -54,7 +54,7 @@ public class MicrobusinessService {
             return new ResponseEntity<>(jsonResponse, HttpStatus.BAD_REQUEST);
         }
         var imageEntity = microbusinessDTO.getImagenes().stream()
-                .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
+                .map(imgDTO -> modelMapper.map(imgDTO, ImageEntity.class)).toList();
         MicrobusinessEntity microEntity = new MicrobusinessEntity(microbusinessDTO, categoryOptional.get(),
                 imageEntity);
         microbusinessRepository.save(microEntity);
@@ -76,7 +76,7 @@ public class MicrobusinessService {
                 microEntity.edit(microbusinessDTO, categoryEntity, imageEntity);
             } else {
                 var convertedImageEntity = imageDTO.stream()
-                        .map(img -> MapperConverter.generate().map(img, ImageEntity.class)).toList();
+                        .map(img -> modelMapper.map(img, ImageEntity.class)).toList();
                 microEntity.edit(microbusinessDTO, categoryEntity, convertedImageEntity);
                 imageRepository.cleanOrphanImages();
             }
@@ -97,7 +97,7 @@ public class MicrobusinessService {
             throw new SqlEmptyResponse("Microbusiness not found");
         }
         var response = microBusinessRepo.stream()
-                .map(dto -> MapperConverter.generate().map(dto, MicrobusinessSearchbarDTO.class)).toList();
+                .map(dto -> modelMapper.map(dto, MicrobusinessSearchbarDTO.class)).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -105,7 +105,7 @@ public class MicrobusinessService {
         var foundMicro = microbusinessRepository.findAllActive(category);
         if (!foundMicro.isEmpty()) {
             var responseDTO = foundMicro.stream()
-                    .map(entity -> MapperConverter.generate().map(entity, MicrobusinessCategoryDTO.class))
+                    .map(entity -> modelMapper.map(entity, MicrobusinessCategoryDTO.class))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(responseDTO);
         } else {
@@ -138,7 +138,7 @@ public class MicrobusinessService {
             throw new SqlEmptyResponse("No se encontaron emprendimientos en la base de datos");
         }
         var jsonResponse = microSearch.stream()
-                .map(micro -> MapperConverter.generate().map(micro, MicrobusinessSearchbarDTO.class)).toList();
+                .map(micro -> modelMapper.map(micro, MicrobusinessSearchbarDTO.class)).toList();
         return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
     }
 
@@ -161,7 +161,7 @@ public class MicrobusinessService {
     public List<MicrobusinessDTO> microsNotSent() {
         List<MicrobusinessEntity> microSearch = microbusinessRepository.findByEnviadoPorMailFalse();
         microsTosent(microSearch);
-        return microSearch.stream().map(entity -> MapperConverter.generate().map(entity, MicrobusinessDTO.class))
+        return microSearch.stream().map(entity -> modelMapper.map(entity, MicrobusinessDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -178,7 +178,7 @@ public class MicrobusinessService {
                 throw new SqlEmptyResponse("No micro found");
             }
             var response = listOfActiveMicros.stream()
-                    .map(a -> MapperConverter.generate().map(a, MicrobusinessSearchbarDTO.class)).toList();
+                    .map(a -> modelMapper.map(a, MicrobusinessSearchbarDTO.class)).toList();
             return ResponseEntity.ok(response);
         } else {
             var listOfInactiveMicros = microbusinessRepository.findByActivoFalseOrderByFechaDesc();
@@ -186,7 +186,7 @@ public class MicrobusinessService {
                 throw new SqlEmptyResponse("No micro found");
             }
             var response = listOfInactiveMicros.stream()
-                    .map(a -> MapperConverter.generate().map(a, MicrobusinessSearchbarDTO.class)).toList();
+                    .map(a -> modelMapper.map(a, MicrobusinessSearchbarDTO.class)).toList();
             return ResponseEntity.ok(response);
         }
     }

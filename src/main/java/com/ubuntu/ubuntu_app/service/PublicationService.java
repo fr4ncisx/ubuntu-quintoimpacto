@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationRepository;
 import com.ubuntu.ubuntu_app.Repository.PublicationViewRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.date.GlobalDate;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalParameterException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
@@ -36,11 +36,12 @@ public class PublicationService {
     private final PublicationRepository publicationRepository;
     private final PublicationViewRepository publicationViewRepository;
     private final ImageRepository imageRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional
     public ResponseEntity<?> create(PublicationRequestDTO publicationsDTO) {
         var imageEntity = publicationsDTO.getImagenes().stream()
-                .map(imgDTO -> MapperConverter.generate().map(imgDTO, ImageEntity.class)).toList();
+                .map(imgDTO -> modelMapper.map(imgDTO, ImageEntity.class)).toList();
         PublicationEntity publicationEntity = new PublicationEntity(publicationsDTO, imageEntity);
         publicationRepository.save(publicationEntity);
         var jsonResponse = ResponseMap.createResponse("Publicación creada");
@@ -59,7 +60,7 @@ public class PublicationService {
             publicationFound.edit(publicationsDTO, imageEntity);
         } else {
             var convertedImgEntity = publicationsDTO.getImagenes().stream()
-                    .map(img -> MapperConverter.generate().map(img, ImageEntity.class)).toList();
+                    .map(img -> modelMapper.map(img, ImageEntity.class)).toList();
             publicationFound.edit(publicationsDTO, convertedImgEntity);
             imageRepository.cleanOrphanImages();
         }
@@ -68,7 +69,7 @@ public class PublicationService {
 
     public ResponseEntity<?> findById(Long id) {
         var publicationFound = publicationFinder(id);
-        var jsonResponse = MapperConverter.generate().map(publicationFound, PublicationDTO.class);
+        var jsonResponse = modelMapper.map(publicationFound, PublicationDTO.class);
         return ResponseEntity.ok(jsonResponse);
     }
 
@@ -138,12 +139,12 @@ public class PublicationService {
                 throw new SqlEmptyResponse("No publications match with that word");
             } else {
                 var responseLowerCase = searchWithLowerCase.stream()
-                        .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+                        .map(list -> modelMapper.map(list, PublicationDTO.class));
                 return ResponseEntity.ok(responseLowerCase);
             }
         }
         var responseDTO = searchNormalized.stream()
-                .map(list -> MapperConverter.generate().map(list, PublicationDTO.class));
+                .map(list -> modelMapper.map(list, PublicationDTO.class));
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -161,7 +162,7 @@ public class PublicationService {
             throw new SqlEmptyResponse("No publications found");
         }
         var responseDTO = listOfPublications.stream()
-                .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
+                .map(entity -> modelMapper.map(entity, PublicationDTO.class)).toList();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

@@ -2,7 +2,8 @@ package com.ubuntu.ubuntu_app.model.dto;
 
 import java.time.LocalDate;
 
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import org.modelmapper.ModelMapper;
+
 import com.ubuntu.ubuntu_app.model.entities.ContactRequestEntity;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +24,8 @@ public class ContactRequestIdDTO {
     private boolean gestionado;
 
     public ContactRequestIdDTO(ContactRequestEntity contactRequest) {
-        this.microemprendimiento = MapperConverter.generate().map(contactRequest.getMicrobusiness(), MicrobusinessNameDTO.class);
+        ModelMapper modelMapper = new ModelMapper();
+        this.microemprendimiento = modelMapper.map(contactRequest.getMicrobusiness(), MicrobusinessNameDTO.class);
         this.id = contactRequest.getId();
         this.fecha_solicitud = contactRequest.getDate();
         this.nombre = contactRequest.getFullName();

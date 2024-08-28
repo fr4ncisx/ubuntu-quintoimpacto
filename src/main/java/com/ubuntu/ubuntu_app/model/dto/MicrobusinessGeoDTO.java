@@ -3,7 +3,8 @@ package com.ubuntu.ubuntu_app.model.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
+import org.modelmapper.ModelMapper;
+
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class MicrobusinessGeoDTO {
     private List<ImageDTO> imagenes;
 
     public MicrobusinessGeoDTO(MicrobusinessEntity micro, double distance) {
+        ModelMapper modelMapper = new ModelMapper();
         this.id = micro.getId();
         this.nombre = micro.getNombre();
         this.descripcion = micro.getDescripcion();
@@ -35,9 +37,9 @@ public class MicrobusinessGeoDTO {
         this.pais = micro.getPais();
         this.provincia = micro.getProvincia();
         this.ciudad = micro.getCiudad();
-        this.categoria = MapperConverter.generate().map(micro.getCategoria(), CategoryDTO.class);
+        this.categoria = modelMapper.map(micro.getCategoria(), CategoryDTO.class);
         this.subcategoria = micro.getSubcategoria();
-        this.imagenes = micro.getImagenes().stream().map(i -> MapperConverter.generate().map(i, ImageDTO.class))
+        this.imagenes = micro.getImagenes().stream().map(i -> modelMapper.map(i, ImageDTO.class))
                 .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
 import com.ubuntu.ubuntu_app.Repository.UserRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.UserDto;
@@ -11,6 +10,7 @@ import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 
 import lombok.RequiredArgsConstructor;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserService {    
 
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     public ResponseEntity<?> registerUser(UserDto userDto) {
         UserEntity user = new UserEntity(userDto);
@@ -66,7 +67,7 @@ public class UserService {
 
     public ResponseEntity<?> findAllUsers() {
         List<UserEntity> users = userRepository.findAll();
-        List<UserFetchDTO> responseDTO = users.stream().map(userEntity -> MapperConverter.generate()
+        List<UserFetchDTO> responseDTO = users.stream().map(userEntity -> modelMapper
         .map(userEntity, UserFetchDTO.class))
         .collect(Collectors.toList());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -82,7 +83,7 @@ public class UserService {
         if(!userFound.isPresent()){
             throw new SqlEmptyResponse("No user found with email: " + email);
         }
-        var jsonResponse = MapperConverter.generate().map(userFound.get(), UserUpdateDTO.class);
+        var jsonResponse = modelMapper.map(userFound.get(), UserUpdateDTO.class);
         return ResponseEntity.ok(jsonResponse);
     }
 

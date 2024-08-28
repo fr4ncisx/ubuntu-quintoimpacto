@@ -2,13 +2,13 @@ package com.ubuntu.ubuntu_app.service;
 
 import java.time.LocalDate;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ubuntu.ubuntu_app.Repository.BugRepository;
-import com.ubuntu.ubuntu_app.configuration.MapperConverter;
 import com.ubuntu.ubuntu_app.infra.errors.IllegalRewriteException;
 import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
@@ -25,13 +25,14 @@ import lombok.RequiredArgsConstructor;
 public class BugService {
 
     private final BugRepository bugRepository;
+    private final ModelMapper modelMapper;
 
     public ResponseEntity<?> getAll() {
         var listOfBugs = bugRepository.findByFixedFalseOrderByDateDesc();
         if(listOfBugs.isEmpty()){
             throw new SqlEmptyResponse("There are no unfixed bugs");
         }
-        return ResponseEntity.ok(listOfBugs.stream().map(f -> MapperConverter.generate().map(f, UnfixedBugDTO.class)).toList());
+        return ResponseEntity.ok(listOfBugs.stream().map(f -> modelMapper.map(f, UnfixedBugDTO.class)).toList());
     }
 
     @Transactional
@@ -61,6 +62,6 @@ public class BugService {
         if(fixedBugs.isEmpty()){
             throw new SqlEmptyResponse("There are not bugs to display");
         }
-        return ResponseEntity.ok(fixedBugs.stream().map(fix -> MapperConverter.generate().map(fix, FixedBugDTO.class)).toList());
+        return ResponseEntity.ok(fixedBugs.stream().map(fix -> modelMapper.map(fix, FixedBugDTO.class)).toList());
     }
 }
