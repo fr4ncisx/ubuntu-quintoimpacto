@@ -1,4 +1,4 @@
-package com.ubuntu.ubuntu_app.controller;
+package com.ubuntu.ubuntu_app.infra.security;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

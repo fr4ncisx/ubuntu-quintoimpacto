@@ -37,6 +37,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/publications/click",
             "/publications/search",
             "/publications/find-all",
+            "/micro/api/near",
             "/micro/find",
             "/micro/find/category",
             "/bug",

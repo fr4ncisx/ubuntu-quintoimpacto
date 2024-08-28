@@ -106,4 +106,10 @@ public class MicrobussinesController {
         public ResponseEntity<?> findAllMicroActiveOrInactive(@RequestParam boolean active) {
                 return microbusinessService.findAllMicroByActive(active);
         }
+
+        @Operation(summary = "Buscar microemprendimientos cercanos", description = "Ingresar coordenadas por parámetros. lon=longitud, lat=latitud")
+        @GetMapping("/api/near")
+        public ResponseEntity<?> getNearMicro(@RequestParam double lat, @RequestParam double lon ){
+                return microbusinessService.getNearMicro(lat, lon);
+        }
 }

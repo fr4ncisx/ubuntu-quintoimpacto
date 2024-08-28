@@ -187,6 +187,20 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_GATEWAY);
     }
 
+    @ExceptionHandler(GeocodeErrorException.class)
+    public ResponseEntity<?> unableToGeocode(GeocodeErrorException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMensaje());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(HttpResponseErrorException.class)
+    public ResponseEntity<?> httpResponseError(HttpResponseErrorException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMensaje());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
     private record ShowFieldErrors(String campo, String error) {
     }
 

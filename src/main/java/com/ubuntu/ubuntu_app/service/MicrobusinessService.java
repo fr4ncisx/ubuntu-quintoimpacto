@@ -15,15 +15,19 @@ import com.ubuntu.ubuntu_app.infra.errors.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.infra.statuses.ResponseMap;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessCategoryDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
+import com.ubuntu.ubuntu_app.model.dto.MicrobusinessGeoDTO;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessSearchbarDTO;
 import com.ubuntu.ubuntu_app.model.entities.CategoryEntity;
 import com.ubuntu.ubuntu_app.model.entities.ImageEntity;
 import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 import com.ubuntu.ubuntu_app.model.filters.StringFilter;
+import com.ubuntu.ubuntu_app.service.geo.GeoDistanceService;
+import com.ubuntu.ubuntu_app.service.geo.GeoLocationService.Nominatim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,8 @@ public class MicrobusinessService {
     private final MicrobusinessRepository microbusinessRepository;
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
+    private final GeoDistanceService geoDistanceService;
+    //private final GeoLocationService geoLocationService;
 
     public ResponseEntity<?> create(MicrobusinessDTO microbusinessDTO) {
         Optional<CategoryEntity> categoryOptional = categoryRepository
@@ -111,7 +117,7 @@ public class MicrobusinessService {
             return setActive(id, false, "El microemprendimiento fue ocultado");
         } else {
             return setActive(id, true, "El microemprendimiento fue activado");
-        }   
+        }
     }
 
     public ResponseEntity<?> deleteMicro(Long id) {
@@ -184,14 +190,32 @@ public class MicrobusinessService {
         }
     }
 
-    private ResponseEntity<?> setActive(Long id, boolean b, String message){
+    private ResponseEntity<?> setActive(Long id, boolean b, String message) {
         var microSearch = microbusinessRepository.findById(id);
-            if (!microSearch.isPresent()) {
-                throw new SqlEmptyResponse("Micro not found");
-            }
-            microSearch.get().setActivo(b);
-            microbusinessRepository.save(microSearch.get());
-            var jsonResponse = ResponseMap.createResponse(message);
-            return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
+        if (!microSearch.isPresent()) {
+            throw new SqlEmptyResponse("Micro not found");
+        }
+        microSearch.get().setActivo(b);
+        microbusinessRepository.save(microSearch.get());
+        var jsonResponse = ResponseMap.createResponse(message);
+        return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getNearMicro(double lat, double lon) {
+        var listOfMicro = microbusinessRepository.findByActivoTrueOrderByFechaDesc();
+        if (listOfMicro.isEmpty()) {
+            throw new SqlEmptyResponse("No micro found");
+        }
+        List<MicrobusinessGeoDTO> listGeo = listOfMicro.stream()
+            .filter(micro -> micro.getCiudad() != null && micro.getPais() != null)
+            .map(micro -> {
+                Nominatim coordinates = geoDistanceService.getCoordinatesByName(micro.getCiudad(), micro.getPais());
+                double distance = geoDistanceService.calculate(lat, lon, coordinates.lat(), coordinates.lon());
+                return new MicrobusinessGeoDTO(micro, distance);
+            })
+            .sorted(Comparator.comparingDouble(MicrobusinessGeoDTO::getDistance))
+            .limit(10)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(listGeo);
     }
 }

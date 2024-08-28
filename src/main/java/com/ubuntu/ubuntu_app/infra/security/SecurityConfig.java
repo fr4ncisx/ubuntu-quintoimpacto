@@ -45,6 +45,7 @@ public class SecurityConfig {
                     authRequest.requestMatchers("/publications/hide").hasRole("ADMIN");
                     // TODO: Microemprendimientos
                     authRequest.requestMatchers("/micro/find").permitAll();
+                    authRequest.requestMatchers("/micro/api/near").permitAll();                    
                     authRequest.requestMatchers("/micro/find/category").permitAll();
                     authRequest.requestMatchers("/micro/api/find-all").hasRole("ADMIN");
                     authRequest.requestMatchers("/micro/api/statistics/micro").hasRole("ADMIN");

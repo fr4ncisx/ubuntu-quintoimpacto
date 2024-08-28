@@ -18,6 +18,12 @@ public class ResponseMap {
         return responseMap;
     }
 
+    public static <T> Map<String, T> createResponse(String key, T tGeneric) {
+        Map<String, T> responseMap = new HashMap<>();
+        responseMap.put(key, tGeneric);
+        return responseMap;
+    }
+
     public static Map<String, String> botResponse(String message) {
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put("Respuesta", message);
