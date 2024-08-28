@@ -92,26 +92,6 @@ public class PublicationService {
         return ResponseEntity.ok(ResponseMap.createResponse("Added new visualization"));
     }
 
-    // public ResponseEntity<?> findAllActiveRecentPublications() {
-    //     var listOfPublications = publicationRepository.findAllByActiveTrueOrderByDateDesc();
-    //     if (listOfPublications.isEmpty()) {
-    //         throw new SqlEmptyResponse("No publications found");
-    //     }
-    //     var responseDTO = listOfPublications.stream()
-    //             .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
-    //     return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    // }
-
-    // public ResponseEntity<?> findAll() {
-    //     var listOfPublications = publicationRepository.findAll();
-    //     if (listOfPublications.isEmpty()) {
-    //         throw new SqlEmptyResponse("No publications found");
-    //     }
-    //     var responseDTO = listOfPublications.stream()
-    //             .map(entity -> MapperConverter.generate().map(entity, PublicationDTO.class)).toList();
-    //     return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    // }
-
     public ResponseEntity<?> getStatistics(Long limitSize) {
         List<PublicationStatisticsDTO> statistics = new ArrayList<>();
         if (limitSize <= 0) {
