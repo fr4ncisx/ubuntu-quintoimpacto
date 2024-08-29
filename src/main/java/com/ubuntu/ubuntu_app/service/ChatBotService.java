@@ -3,7 +3,6 @@ package com.ubuntu.ubuntu_app.service;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.es.SpanishLightStemFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,7 +109,6 @@ public class ChatBotService {
         Optional<InnerChatBotService> bestMatch = debugChatBot.stream()
                 .filter(result -> result.similarityScore() >= similarityThreshold)
                 .max(Comparator.comparing(InnerChatBotService::similarityScore));
-
         if (bestMatch.isPresent()) {
             var answerObtained = bestMatch.get().response();
             var similarityScore = bestMatch.get().similarityScore();
@@ -161,21 +159,18 @@ public class ChatBotService {
         if (question == null || question.isEmpty()) {
             return "";
         }
-        try (TokenStream tokenStream = new WhitespaceAnalyzer().tokenStream(null, new StringReader(question));
-                TokenStream filteredTokenStream = new SpanishLightStemFilter(tokenStream)) {
-
-            CharTermAttribute charTermAttribute = filteredTokenStream.addAttribute(CharTermAttribute.class);
-            filteredTokenStream.reset();
+        try (TokenStream tokenStream = new WhitespaceAnalyzer().tokenStream(null, new StringReader(question))) {
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            tokenStream.reset();
             StringBuilder result = new StringBuilder();
-            while (filteredTokenStream.incrementToken()) {
+            while (tokenStream.incrementToken()) {
                 String term = charTermAttribute.toString().toLowerCase();
                 term = term.replaceAll("[¿?!*]", "");
                 if (!isStopWord(term)) {
                     result.append(term).append(' ');
                 }
             }
-            filteredTokenStream.end();
-
+            tokenStream.end();
             return result.length() > 0 ? result.substring(0, result.length() - 1).toLowerCase() : "";
         } catch (IOException e) {
             return question.toLowerCase().trim();
