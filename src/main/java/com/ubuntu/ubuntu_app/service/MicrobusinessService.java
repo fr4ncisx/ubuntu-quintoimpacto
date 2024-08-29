@@ -47,6 +47,7 @@ public class MicrobusinessService {
     private final GeoDistanceService geoDistanceService;
     private final ModelMapper modelMapper;
 
+    @Transactional
     public ResponseEntity<?> create(MicrobusinessDTO microbusinessDTO) {
         Optional<CategoryEntity> categoryOptional = categoryRepository
                 .findByNombre(microbusinessDTO.getCategoria().getNombre());
@@ -63,6 +64,7 @@ public class MicrobusinessService {
         return new ResponseEntity<>(jsonResponse, HttpStatus.CREATED);
     }
 
+    @Transactional
     public ResponseEntity<?> update(MicrobusinessDTO microbusinessDTO, Long id) {
         var microSearch = microbusinessRepository.findById(id);
         if (microSearch.isPresent()) {
@@ -114,6 +116,7 @@ public class MicrobusinessService {
         }
     }
 
+    @Transactional
     public ResponseEntity<?> hideMicro(Long id, boolean enable) {
         if (!enable) {
             return setActive(id, false, "El microemprendimiento fue ocultado");
@@ -122,6 +125,7 @@ public class MicrobusinessService {
         }
     }
 
+    @Transactional
     public ResponseEntity<?> deleteMicro(Long id) {
         var microSearch = microbusinessRepository.findById(id);
         if (microSearch.isPresent()) {
@@ -192,6 +196,7 @@ public class MicrobusinessService {
         }
     }
 
+    @Transactional
     private ResponseEntity<?> setActive(Long id, boolean b, String message) {
         var microSearch = microbusinessRepository.findById(id);
         if (!microSearch.isPresent()) {

@@ -61,17 +61,17 @@ public class PublicationController {
     @Operation(summary = "Buscar publicaciones activas o inactivas", description = "Ingresar parametro active=true (Publicaciones activas), active=false (Publicaciones inactivas)")
     @GetMapping("/find-all")
     public ResponseEntity<?> findAllPublicationsOrdered(@RequestParam boolean active) {
-            return publicationService.findAllPublications(active);
+        return publicationService.findAllPublications(active);
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchPublication(@RequestParam String publication) {
-            return publicationService.findPublication(publication);
+        return publicationService.findPublication(publication);
     }
 
     @Operation(summary = "Eliminar publicación", description = "Ingresar parametro id con el id de la publicación respectiva")
     @DeleteMapping("/delete")
     public ResponseEntity<?> deletePublication(@RequestParam Long id) {
         return publicationService.delete(id);
-}
+    }
 }
