@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 @Service
 public class MicrobusinessService {
 
+    private static final long LIMIT_MAX = 10;
     private final MicrobusinessRepository microbusinessRepository;
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
@@ -212,12 +213,17 @@ public class MicrobusinessService {
             .filter(micro -> micro.getCiudad() != null && micro.getPais() != null)
             .map(micro -> {
                 Nominatim coordinates = geoDistanceService.getCoordinatesByName(micro.getProvincia(), micro.getCiudad(), micro.getPais());
+                if(coordinates == null){
+                    return null;
+                }
                 double distance = geoDistanceService.calculate(lat, lon, coordinates.lat(), coordinates.lon());
-                return new MicrobusinessGeoDTO(micro, distance);
+                return new MicrobusinessGeoDTO(micro, distance);                
             })
+            .filter(dto -> dto != null)
             .sorted(Comparator.comparingDouble(MicrobusinessGeoDTO::getDistance))
-            .limit(10)
+            .limit(LIMIT_MAX)
             .collect(Collectors.toList());
+
         return ResponseEntity.ok(listGeo);
     }
 }

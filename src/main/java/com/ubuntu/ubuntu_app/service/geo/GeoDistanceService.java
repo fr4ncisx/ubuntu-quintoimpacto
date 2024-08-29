@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.ubuntu.ubuntu_app.infra.errors.GeocodeErrorException;
 import com.ubuntu.ubuntu_app.service.geo.GeoLocationService.Nominatim;
 
 @Component
@@ -44,10 +43,9 @@ public class GeoDistanceService {
             .toUriString();
         Nominatim[] response = restTemplate.getForObject(url, Nominatim[].class);
         if (response == null || response.length == 0) {
-            throw new GeocodeErrorException("Unable to return coordinates");
+            return null;
         }
         return response[0];
-
     }
 
     private double cleanDecimalFormat(double d, String pattern) {
