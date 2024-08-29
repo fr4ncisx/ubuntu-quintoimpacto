@@ -26,16 +26,18 @@ public class GeoDistanceService {
         return cleanDecimalFormat(total, "#.##");
     }
 
-    public Nominatim getCoordinatesByName(String city, String country) {
+    public Nominatim getCoordinatesByName(String province, String city, String country) {
         RestTemplate restTemplate = new RestTemplate();
         String url = UriComponentsBuilder
             .fromHttpUrl(nominatimUrl)
             .queryParam("city", city)
+            .queryParam("state", province)
             .queryParam("country", country)
             .queryParam("format", "json")
             .queryParam("limit", 1)
             .build(false)
             .toUriString();
+            System.out.println(url);
         Nominatim[] response = restTemplate.getForObject(url, Nominatim[].class);
         if (response == null || response.length == 0) {
             throw new GeocodeErrorException("Unable to return coordinates");

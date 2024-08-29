@@ -8,7 +8,7 @@ public class StopWords {
     private static final Set<String> LATIN_AMERICAN_SPANISH_STOP_WORDS = new HashSet<>(Arrays.asList(
     "al", "algo", "algunas", "algunos", "allá", "allí", "ambos", "ante", "antes", "aquel", "aquella",
     "aquellas", "aquello", "aquellos", "aquí", "arriba", "abajo", "así", "atrás", "aun", "aunque", "bajo",
-    "bastante", "cabe", "cada", "casi", "cierto", "con", "conmigo", "conseguimos",
+    "bastante", "cabe", "cada", "casi", "cierto", "con", "conmigo", "como", "conseguimos",
     "conseguir", "consigo", "consigue", "consiguen", "consigues", "contigo", "contra", "cual", "cuales",
     "cualquier", "cualquiera", "cuan", "cuando", "cuanto", "cuanta", "cuantas", "cuantos", "de", "dejar",
     "del", "demás", "demasiado", "dentro", "desde", "dos", "donde", "durante", "el", "él", "ella",

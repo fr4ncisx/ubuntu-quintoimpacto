@@ -211,7 +211,7 @@ public class MicrobusinessService {
         List<MicrobusinessGeoDTO> listGeo = listOfMicro.stream()
             .filter(micro -> micro.getCiudad() != null && micro.getPais() != null)
             .map(micro -> {
-                Nominatim coordinates = geoDistanceService.getCoordinatesByName(micro.getCiudad(), micro.getPais());
+                Nominatim coordinates = geoDistanceService.getCoordinatesByName(micro.getProvincia(), micro.getCiudad(), micro.getPais());
                 double distance = geoDistanceService.calculate(lat, lon, coordinates.lat(), coordinates.lon());
                 return new MicrobusinessGeoDTO(micro, distance);
             })
