@@ -72,7 +72,10 @@ public class JWTUtils {
     }
 
     public String validateTokenLocal(String token) {
-        JWTVerifier verifier = JWT.require(getAlgorithm()).withIssuer("Ubuntu Application").build();
+        JWTVerifier verifier = 
+            JWT.require(getAlgorithm())
+            .withIssuer("Ubuntu Application")
+            .build();
         return verifier.verify(token).getSubject();
     }
 

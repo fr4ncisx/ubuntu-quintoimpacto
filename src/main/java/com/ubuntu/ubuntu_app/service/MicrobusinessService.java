@@ -224,7 +224,7 @@ public class MicrobusinessService {
                 double distance = geoDistanceService.calculate(lat, lon, coordinates.lat(), coordinates.lon());
                 return new MicrobusinessGeoDTO(micro, distance);                
             })
-            .filter(dto -> dto != null)
+            .filter(micro -> micro != null)
             .sorted(Comparator.comparingDouble(MicrobusinessGeoDTO::getDistance))
             .limit(LIMIT_MAX)
             .collect(Collectors.toList());

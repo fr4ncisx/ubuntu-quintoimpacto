@@ -1,5 +1,6 @@
 package com.ubuntu.ubuntu_app.service;
 
+import com.ubuntu.ubuntu_app.infra.errors.EmailNotFoundException;
 import com.ubuntu.ubuntu_app.model.dto.MicrobusinessDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -36,6 +37,9 @@ public class MailService {
     public void prepareNewsMicroBussinessToSend() throws MessagingException {
         List<MicrobusinessDTO> micros = microbusinessService.microsNotSent();
         String[] admins = userService.findAllEmails();
+        if(admins == null || admins.length == 0){
+            throw new EmailNotFoundException("There are no emails able to send newsletters");
+        }
         sendNewMicroBusinessToAdmins(admins, "Informe Semanal Ubuntu", micros);
     }
 
