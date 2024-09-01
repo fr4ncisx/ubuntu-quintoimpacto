@@ -2,8 +2,6 @@ package com.ubuntu.ubuntu_app.service.geo;
 
 import java.text.DecimalFormat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,7 +12,7 @@ import com.ubuntu.ubuntu_app.service.geo.GeoLocationService.Nominatim;
 @Component
 public class GeoDistanceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GeoDistanceService.class);
+    //private static final Logger logger = LoggerFactory.getLogger(GeoDistanceService.class);
     @Value("${nominatim.search}")
     private String nominatimUrl;
 
@@ -31,7 +29,7 @@ public class GeoDistanceService {
 
     public Nominatim getCoordinatesByName(String province, String city, String country) {
         RestTemplate restTemplate = new RestTemplate();
-        logger.info(province);
+        //logger.info(province);
         String url = UriComponentsBuilder
             .fromHttpUrl(nominatimUrl)
             .queryParam("city", city)
