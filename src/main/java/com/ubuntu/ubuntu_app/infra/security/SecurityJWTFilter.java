@@ -64,6 +64,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         String email = null;
         String token = null;
         String uri = request.getRequestURI();
+        System.out.println(uri);
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
