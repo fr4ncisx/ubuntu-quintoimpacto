@@ -45,22 +45,7 @@ public class FileService {
         boolean validationOK = false;
         for (Entry<String, String> fileMap : extensionsMap.entrySet()) {
             switch (fileMap.getValue()) {
-                case "png" -> {
-                    validationOK = true;
-                    break;
-                }
-                case "jpg" -> {
-                    validationOK = true;
-                    break;
-                }
-                case "jpeg" -> {
-                    validationOK = true;
-                    break;
-                }
-                case "webp" -> {
-                    validationOK = true;
-                    break;
-                }
+                case "png","jpg","jpeg","webp" -> validationOK = true;           
                 default -> listOfBadFiles.add(new FileExtensionRecord("Extensión inválida",
                         fileMap.getValue().toUpperCase(), fileMap.getKey()));
             }

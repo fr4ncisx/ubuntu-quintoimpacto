@@ -12,7 +12,6 @@ import com.ubuntu.ubuntu_app.service.geo.GeoLocationService.Nominatim;
 @Component
 public class GeoDistanceService {
 
-    //private static final Logger logger = LoggerFactory.getLogger(GeoDistanceService.class);
     @Value("${nominatim.search}")
     private String nominatimUrl;
 
@@ -29,9 +28,7 @@ public class GeoDistanceService {
 
     public Nominatim getCoordinatesByName(String province, String city, String country) {
         RestTemplate restTemplate = new RestTemplate();
-        //logger.info(province);
-        String url = UriComponentsBuilder
-            .fromHttpUrl(nominatimUrl)
+        String url = UriComponentsBuilder.fromUriString(nominatimUrl)
             .queryParam("city", city)
             .queryParam("state", province)
             .queryParam("country", country)

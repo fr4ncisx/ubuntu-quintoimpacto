@@ -28,18 +28,17 @@ public class GeoLocationService {
     }
 
     private LocationDTO getLocation(double latitude, double longitude) {
-        String url = UriComponentsBuilder.fromHttpUrl(nominatimUrl)
+        String url = UriComponentsBuilder.fromUriString(nominatimUrl)
                 .queryParam("format", "jsonv2")
                 .queryParam("lat", latitude)
                 .queryParam("lon", longitude)
                 .toUriString();
         RestTemplate restTemplate = new RestTemplate();
         var response = restTemplate.getForObject(url, JsonDTO.class);
-        if (response.error() != null) {
-            if (response.error().equals("Unable to geocode")) {
+        if (response.error() != null && response.error().equals("Unable to geocode")) {
                 throw new GeocodeErrorException("There was a problem with the response");
             }
-        }
+        
         return response.address();
     }
 
