@@ -5,8 +5,6 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.ubuntu.ubuntu_app.Repository.UserRepository;
 import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 import com.ubuntu.ubuntu_app.model.enums.UserRole;
@@ -22,13 +20,12 @@ public class UsersSeeder implements CommandLineRunner{
     private final UserRepository userRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         if(userRepository.count() == 0){
-            //loadUsers();
+            loadUsers();
         }        
     }
 
-    @Transactional
     private void loadUsers(){
         List<UserEntity> listOfUsers = Arrays.asList(
             new UserEntity("Ubuntu", "Administracion", "semilleroubuntu.dev@gmail.com", UserRole.ADMIN, RandomPhoneGenerator.create(), null),

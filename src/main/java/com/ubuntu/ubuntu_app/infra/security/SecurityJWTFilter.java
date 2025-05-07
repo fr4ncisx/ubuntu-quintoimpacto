@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@RequiredArgsConstructor
 @Component
 public class SecurityJWTFilter extends OncePerRequestFilter {
 
@@ -54,7 +57,6 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
     @Value("${token.expiration:120}")
     private int expirationTime;
 
-    @Autowired
     private JWTUtils jwtUtils;
 
     @Override
@@ -64,7 +66,6 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
         String email = null;
         String token = null;
         String uri = request.getRequestURI();
-        System.out.println(uri);
         boolean isPublicEndpoint = publicEndpoints.stream().anyMatch(uri::startsWith);
         if (authorizationHeader == null && !isPublicEndpoint) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

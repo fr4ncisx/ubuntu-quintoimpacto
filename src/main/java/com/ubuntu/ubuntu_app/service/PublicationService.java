@@ -98,14 +98,14 @@ public class PublicationService {
         if (limitSize <= 0) {
             throw new IllegalParameterException("Expected limitSize above 0");
         }
-        var listOfPublicationsFound = publicationRepository.findByIdCurrentMonthAndActive(GlobalDate.getCurrentMonth(),
-                GlobalDate.getCurrentYear());
+        var listOfPublicationsFound = publicationRepository.findByIdCurrentMonthAndActive(GlobalDate.getMONTH(),
+                GlobalDate.getYEAR());
         if (listOfPublicationsFound.isEmpty()) {
             throw new SqlEmptyResponse("No publications found");
         }
         for (PublicationEntity publicationEntity : listOfPublicationsFound) {
             var count = publicationViewRepository.getClickCountActualMonth(publicationEntity.getId(),
-                    GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear());
+                    GlobalDate.getMONTH(), GlobalDate.getYEAR());
             statistics.add(
                     new PublicationStatisticsDTO(publicationEntity.getTitle(), publicationEntity.getDate(), count));
         }
@@ -120,7 +120,7 @@ public class PublicationService {
 
     private PublicationEntity publicationFinder(Long id) {
         var optionalPublication = publicationRepository.findById(id);
-        if (!optionalPublication.isPresent()) {
+        if (optionalPublication.isEmpty()) {
             throw new SqlEmptyResponse("Publication not found");
         } else {
             return optionalPublication.get();
@@ -128,7 +128,7 @@ public class PublicationService {
     }
 
     public ResponseEntity<?> findPublication(String publication) {
-        if (publication.isBlank() || publication == null) {
+        if (publication.isBlank()) {
             throw new IllegalParameterException("Input is required");
         }
         var searchNormalized = publicationRepository
@@ -157,11 +157,10 @@ public class PublicationService {
     }
 
     private ResponseEntity<?> findPublications(List<PublicationEntity> GenericListOfActiveOrInactive) {
-        var listOfPublications = GenericListOfActiveOrInactive;
-        if (listOfPublications.isEmpty()) {
+        if (GenericListOfActiveOrInactive.isEmpty()) {
             throw new SqlEmptyResponse("No publications found");
         }
-        var responseDTO = listOfPublications.stream()
+        var responseDTO = GenericListOfActiveOrInactive.stream()
                 .map(entity -> modelMapper.map(entity, PublicationDTO.class)).toList();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -172,7 +171,7 @@ public class PublicationService {
             throw new IllegalParameterException("Not acceptable value id zero");
         }
         var optionalPublication = publicationRepository.findById(id);
-        if (!optionalPublication.isPresent()) {
+        if (optionalPublication.isEmpty()) {
             throw new SqlEmptyResponse("Publication not found");
         }
         publicationRepository.delete(optionalPublication.get());

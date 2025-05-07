@@ -1,17 +1,15 @@
 package com.ubuntu.ubuntu_app.infra.date;
 
+import lombok.Getter;
+
 import java.time.LocalDate;
 
 public class GlobalDate {
-    private static int currentMonth = LocalDate.now().getMonthValue();
-    private static int currentYear = LocalDate.now().getYear();
 
-    public static int getCurrentMonth() {
-        return currentMonth;
-    }
+    private GlobalDate(){}
 
-    public static int getCurrentYear() {
-        return currentYear;
-    }
-
+    @Getter
+    private static final int MONTH = LocalDate.now().getMonthValue();
+    @Getter
+    private static final int YEAR = LocalDate.now().getYear();
 }

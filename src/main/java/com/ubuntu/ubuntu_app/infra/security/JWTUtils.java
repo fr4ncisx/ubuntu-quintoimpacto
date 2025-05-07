@@ -55,7 +55,7 @@ public class JWTUtils {
             .withClaim("imagen", user.getImagen()) 
             .withClaim("newsletter", user.getSuscribed())   
             .withClaim("vencimiento", LocalDateTime.ofInstant(expirationTime(expirationTime), ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")).toString())         
+            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")))
             .withJWTId(UUID.randomUUID().toString()).sign(getAlgorithm());
     }
 
@@ -89,7 +89,7 @@ public class JWTUtils {
         if (checkIfUserExists != null) {
             return null;
         }
-        UserGoogleDTO newLocalUser = null;
+        UserGoogleDTO newLocalUser;
         if (family_name != null) {
             newLocalUser = new UserGoogleDTO(email, given_name, family_name.toString(), null);
         } else {

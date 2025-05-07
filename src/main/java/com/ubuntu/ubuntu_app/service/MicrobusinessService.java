@@ -148,8 +148,8 @@ public class MicrobusinessService {
     }
 
     public ResponseEntity<?> findAllMicroCurrentMonth() {
-        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getCurrentMonth(),
-                GlobalDate.getCurrentYear());
+        var microFoundThisMonth = microbusinessRepository.findByStatistics(GlobalDate.getMONTH(),
+                GlobalDate.getYEAR());
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", microFoundThisMonth));
     }
 
@@ -157,7 +157,7 @@ public class MicrobusinessService {
         Map<String, Long> listOfStatisticsByCategory = new HashMap<>();
         for (int i = 1; i <= 4; i++) {
             listOfStatisticsByCategory.put("cat:" + i, microbusinessRepository
-                    .findByCategoryStatistics(GlobalDate.getCurrentMonth(), GlobalDate.getCurrentYear(), i));
+                    .findByCategoryStatistics(GlobalDate.getMONTH(), GlobalDate.getYEAR(), i));
         }
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfStatisticsByCategory));
     }
@@ -197,7 +197,7 @@ public class MicrobusinessService {
     }
 
     @Transactional
-    private ResponseEntity<?> setActive(Long id, boolean b, String message) {
+    protected ResponseEntity<?> setActive(Long id, boolean b, String message) {
         var microSearch = microbusinessRepository.findById(id);
         if (!microSearch.isPresent()) {
             throw new SqlEmptyResponse("Micro not found");

@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ubuntu.ubuntu_app.Repository.PaisRepository;
 import com.ubuntu.ubuntu_app.model.entities.PaisEntity;
@@ -23,13 +22,12 @@ public class CountriesSeeder implements CommandLineRunner {
     private final PaisRepository paisRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         if (paisRepository.count() == 0) {
             loadCountries();
         }
     }
 
-    @Transactional
     private void loadCountries() {
         List<PaisEntity> paisEntity = new ArrayList<>();
         List<ProvinciaEntity> listOfArgentinaProvinces = Arrays.asList(
