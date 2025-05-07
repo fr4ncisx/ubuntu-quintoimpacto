@@ -36,3 +36,4 @@ build/
 ### Local environment files ###
 *.env
 docker-compose.yml
+postgres-compose.yml
