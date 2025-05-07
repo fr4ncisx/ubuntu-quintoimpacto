@@ -1,5 +1,7 @@
 package com.ubuntu.ubuntu_app.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.similarity.CosineSimilarity;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
@@ -7,7 +9,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +28,9 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Lazy
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatBotService {
 
     private final CosineSimilarity cosineSimilarity;
@@ -39,14 +41,6 @@ public class ChatBotService {
 
     @Value("${chatbot.similarity.threshold:0.5}")
     private double similarityThreshold;
-
-    public ChatBotService(ChatbotRepository chatbotRepository, CosineSimilarity cosineSimilarity,
-            ChatbotQuestionsRepository chatbotQuestionsRepository, ModelMapper modelMapper) {
-        this.chatbotRepository = chatbotRepository;
-        this.cosineSimilarity = cosineSimilarity;
-        this.chatbotQuestionsRepository = chatbotQuestionsRepository;
-        this.modelMapper = modelMapper;
-    }
 
     public ResponseEntity<?> obtainQuestions(String category) {
         if (category.isBlank()) {
@@ -64,12 +58,12 @@ public class ChatBotService {
     @Cacheable(value = "botResponseDefault", key = "#id")
     public ResponseEntity<?> answerResponseByIdAndFilteredCategory(Long id) {
         var foundQuestion = chatbotQuestionsRepository.findByIdAndCategory(id);
-        if (!foundQuestion.isPresent()) {
+        if (foundQuestion.isEmpty()) {
             throw new SqlEmptyResponse("There are no questions with that id");
         }
         var getFKofAnswer = chatbotQuestionsRepository.findFKofAnswers(id);
         var foundAnswer = chatbotRepository.findById(getFKofAnswer.get());
-        if (!foundAnswer.isPresent()) {
+        if (foundAnswer.isEmpty()) {
             throw new SqlEmptyResponse("There are no answers with that foreign key");
         }
         if (foundAnswer.get().getAnswer().equalsIgnoreCase("Respuesta categorias")) {
@@ -80,7 +74,7 @@ public class ChatBotService {
 
     /**
      * Processes a user question and returns the best matching response.
-     * 
+     *
      * @param question The user's question
      * @return ResponseEntity containing the bot's response
      * @throws InterruptedException
@@ -121,7 +115,7 @@ public class ChatBotService {
 
     /**
      * Calculates the cosine similarity between two questions.
-     * 
+     *
      * @param question1 The first question (user input)
      * @param question2 The second question (database)
      * @return The cosine similarity score
@@ -135,7 +129,7 @@ public class ChatBotService {
 
     /**
      * Converts text to vector
-     * 
+     *
      * @param text
      * @return converted text as vector
      */
@@ -150,7 +144,7 @@ public class ChatBotService {
 
     /**
      * Preprocesses the input text by tokenizing, stemming, and removing stop words.
-     * 
+     *
      * @param question The input text to preprocess
      * @return The preprocessed text
      */

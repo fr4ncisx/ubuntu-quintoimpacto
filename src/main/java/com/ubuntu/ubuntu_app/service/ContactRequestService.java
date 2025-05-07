@@ -93,10 +93,10 @@ public class ContactRequestService {
 
     public ResponseEntity<?> findByStatistics() {
         Map<String, Long> listOfContactRequest = new LinkedHashMap<>();
-        var reviewed = contactRequestRepository.findByStatisticsContact(true, GlobalDate.getCurrentMonth(),
-                GlobalDate.getCurrentYear());
-        var unreviewed = contactRequestRepository.findByStatisticsContact(false, GlobalDate.getCurrentMonth(),
-                GlobalDate.getCurrentYear());
+        var reviewed = contactRequestRepository.findByStatisticsContact(true, GlobalDate.getMONTH(),
+                GlobalDate.getYEAR());
+        var unreviewed = contactRequestRepository.findByStatisticsContact(false, GlobalDate.getMONTH(),
+                GlobalDate.getYEAR());
         listOfContactRequest.put("Reviewed", reviewed);
         listOfContactRequest.put("Unreviewed", unreviewed);
         return ResponseEntity.ok(ResponseMap.responseGeneric("Found", listOfContactRequest));

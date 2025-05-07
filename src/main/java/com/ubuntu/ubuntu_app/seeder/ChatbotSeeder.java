@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ubuntu.ubuntu_app.Repository.ChatbotRepository;
 import com.ubuntu.ubuntu_app.model.entities.ChatbotQuestionEntity;
@@ -23,14 +22,13 @@ public class ChatbotSeeder implements CommandLineRunner {
         private final ChatbotRepository chatbotRepository;
 
         @Override
-        public void run(String... args) throws Exception {
+        public void run(String... args) {
                 if (chatbotRepository.count() == 0) {
                         loadChatbot();
                 }
         }
 
-        @Transactional
-        private void loadChatbot() {
+        public void loadChatbot() {
                 List<ChatbotResponseEntity> listOfResponse = Arrays.asList(                        
                         new ChatbotResponseEntity(null, "Ubuntu es una empresa de financiamiento sostenible, de grupo asociativo, compuesta por 30 personas, originaria de Mendoza, Argentina.", Arrays.asList(
                                 new ChatbotQuestionEntity(null, "¿Quiénes somos?", ChatbotCategory.INSTITUCIONAL))

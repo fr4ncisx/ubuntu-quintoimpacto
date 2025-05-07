@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public final class PreloadCache implements ApplicationRunner{
+public final class PreloadCache implements ApplicationRunner {
     private final ChatBotService chatBotService;
 
     @Override
@@ -23,8 +23,9 @@ public final class PreloadCache implements ApplicationRunner{
         chatBotService.obtainQuestions("PREGUNTAS_FRECUENTES");
 
         log.info("Caching responses of chatbot");
-        for (int i = 1; i <= 11; i++) {
-            chatBotService.answerResponseByIdAndFilteredCategory(Long.valueOf(i));
+        for (long i = 1; i <= 11; i++) {
+            chatBotService.answerResponseByIdAndFilteredCategory(i);
         }
+        log.info("Loaded cache successfully");
     }
 }
