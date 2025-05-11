@@ -1,10 +1,14 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
-
+import com.auth0.jwt.exceptions.AlgorithmMismatchException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.ubuntu.ubuntu_app.model.entities.UserEntity;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,16 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.auth0.jwt.exceptions.AlgorithmMismatchException;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.ubuntu.ubuntu_app.model.entities.UserEntity;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -56,7 +54,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
     @Value("${token.expiration:120}")
     private int expirationTime;
 
-    private JWTUtils jwtUtils;
+    private final JWTUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -78,7 +76,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                 email = payload.getEmail();
                 UserEntity userObtained = jwtUtils.userFinder(email, payload);
                 if (userObtained != null) {
-                    String newToken = jwtUtils.generateToken(userObtained, payload, expirationTime);
+                    String newToken = jwtUtils.generateToken(userObtained, expirationTime);
                     response.setHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + newToken);
                     response.setHeader(HEADER_REGISTRATION, "Not required");
                 } else {
@@ -95,7 +93,7 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                             return;
                         }
                     } catch (URISyntaxException e) {
-                        e.printStackTrace();
+                        logger.warn(e.getMessage());
                     }
                 }
             } else {

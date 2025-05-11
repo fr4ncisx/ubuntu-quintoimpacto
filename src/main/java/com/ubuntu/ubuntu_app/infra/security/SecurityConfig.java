@@ -1,6 +1,5 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,11 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private SecurityJWTFilter jwtFilter;
-
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity security, SecurityJWTFilter jwtFilter) throws Exception {
         return security
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())

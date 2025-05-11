@@ -1,22 +1,11 @@
 package com.ubuntu.ubuntu_app.infra.security;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -26,12 +15,22 @@ import com.ubuntu.ubuntu_app.model.dto.UserGoogleDTO;
 import com.ubuntu.ubuntu_app.model.entities.UserEntity;
 import com.ubuntu.ubuntu_app.model.generator.LastNameGenerator;
 import com.ubuntu.ubuntu_app.service.CloudinaryService;
-
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.auth0.jwt.JWTVerifier;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JWTUtils {
@@ -42,7 +41,7 @@ public class JWTUtils {
     @Value("${jwt.secret.key}")
     private String secret;
 
-    public String generateToken(UserEntity user, Payload payload, int expirationTime) {
+    public String generateToken(UserEntity user, int expirationTime) {
 		return JWT.create()
             .withIssuer("Ubuntu Application")
             .withSubject(user.getEmail())
@@ -79,7 +78,7 @@ public class JWTUtils {
         return verifier.verify(token).getSubject();
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public String createLocalAccount(Payload payload, int expirationTime) throws IOException, URISyntaxException {
         String email = payload.getEmail();
         String given_name = payload.get("given_name").toString();
@@ -99,7 +98,7 @@ public class JWTUtils {
         newLocalUser.setProfileImg(cloudinaryURL);
         UserEntity userEntity = new UserEntity(newLocalUser);
         userRepository.save(userEntity);
-        return generateToken(userEntity, payload, expirationTime);
+        return generateToken(userEntity, expirationTime);
     }
 
     public Payload extractGooglePayload(String googleToken) {
@@ -113,7 +112,7 @@ public class JWTUtils {
                 return idToken.getPayload();
             }
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
         }
         return null;
     }
@@ -125,10 +124,7 @@ public class JWTUtils {
      */
     public UserEntity userFinder(String email) {
         var user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return user.get();
-        }
-        return null;
+        return user.orElse(null);
     }
 
     /**
@@ -139,14 +135,14 @@ public class JWTUtils {
      * @throws URISyntaxException 
      * @throws IOException 
      */
-    @Transactional(readOnly = false)
-    public UserEntity userFinder(String email, Payload payload) throws IOException {
+    @Transactional()
+    public UserEntity userFinder(String email, Payload payload) {
         var user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             var userExists = user.get();
             if (userExists.getImagen() == null) {
                 try {
-                    System.out.println("Debería actualizar tu foto de perfil a Cloudinary");
+                    log.info("Debería actualizar tu foto de perfil a Cloudinary");
                     var cloudinaryURL = cloudinaryService.profilePhotoUploader(payload.get("picture"), 384);
                     userExists.setImagen(cloudinaryURL);
                 } catch (IOException | URISyntaxException e) {
@@ -167,7 +163,7 @@ public class JWTUtils {
                 GoogleIdToken.Payload payload = idToken.getPayload();
                 if (user != null) {
                     String email = payload.getEmail();
-                    return email.toLowerCase().equals(user.getEmail().toLowerCase());
+                    return email.equalsIgnoreCase(user.getEmail());
                 }
             } else {
                 try {
@@ -188,7 +184,7 @@ public class JWTUtils {
                 }
             }
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
         }
         return false;
     }
