@@ -7,36 +7,36 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.5</version>
-        <relativePath />
+        <relativePath/>
         <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ubuntu</groupId>
     <artifactId>ubuntu_app</artifactId>
-    <version>0.0.1</version>
+    <version>1.0</version>
     <name>ubuntu_app</name>
     <description>Ubuntu financiamiento sostenible</description>
-    <url />
+    <url/>
     <licenses>
-        <license />
+        <license/>
     </licenses>
     <developers>
-        <developer />
+        <developer/>
     </developers>
     <scm>
-        <connection />
-        <developerConnection />
-        <tag />
-        <url />
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
     </scm>
     <properties>
         <java.version>21</java.version>
     </properties>
-    <dependencies>  
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
-        </dependency>  
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -53,13 +53,13 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
-        </dependency>             
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.38</version>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
@@ -90,17 +90,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--  Cloudinary Dependencies -->
         <dependency>
             <groupId>com.cloudinary</groupId>
-            <artifactId>cloudinary-http45</artifactId>
-            <version>1.39.0</version>
+            <artifactId>cloudinary-http5</artifactId>
+            <version>2.2.0</version>
         </dependency>
-		<dependency>
-			<groupId>com.cloudinary</groupId>
-			<artifactId>cloudinary-core</artifactId>
-			<version>1.39.0</version>
-		</dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -125,7 +119,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
-       <!-- Mail dependencis -->
+        <!-- Mail dependencis -->
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -136,7 +130,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>                     
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
