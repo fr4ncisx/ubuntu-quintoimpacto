@@ -1,12 +1,5 @@
 package com.ubuntu.ubuntu_app.service;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import com.ubuntu.ubuntu_app.Repository.CategoryRepository;
 import com.ubuntu.ubuntu_app.Repository.ImageRepository;
 import com.ubuntu.ubuntu_app.Repository.MicrobusinessRepository;
@@ -24,15 +17,16 @@ import com.ubuntu.ubuntu_app.model.entities.MicrobusinessEntity;
 import com.ubuntu.ubuntu_app.model.filters.StringFilter;
 import com.ubuntu.ubuntu_app.service.geo.GeoDistanceService;
 import com.ubuntu.ubuntu_app.service.geo.GeoLocationService.Nominatim;
-
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Lazy
@@ -224,10 +218,10 @@ public class MicrobusinessService {
                 double distance = geoDistanceService.calculate(lat, lon, coordinates.lat(), coordinates.lon());
                 return new MicrobusinessGeoDTO(micro, distance);                
             })
-            .filter(micro -> micro != null)
+                .filter(Objects::nonNull)
             .sorted(Comparator.comparingDouble(MicrobusinessGeoDTO::getDistance))
             .limit(LIMIT_MAX)
-            .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(listGeo);
     }
