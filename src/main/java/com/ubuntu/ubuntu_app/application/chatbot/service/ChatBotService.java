@@ -2,10 +2,6 @@ package com.ubuntu.ubuntu_app.application.chatbot.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.similarity.CosineSimilarity;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +14,7 @@ import com.ubuntu.ubuntu_app.application.chatbot.port.out.ChatbotRepositoryPort;
 import com.ubuntu.ubuntu_app.shared.error.IllegalParameterException;
 import com.ubuntu.ubuntu_app.shared.error.SqlEmptyResponse;
 import com.ubuntu.ubuntu_app.shared.api.ResponseMap;
+import com.ubuntu.ubuntu_app.shared.chatbot.QuestionMatcher;
 import com.ubuntu.ubuntu_app.infrastructure.chatbot.adapter.mapper.ChatbotMapper;
 import com.ubuntu.ubuntu_app.application.chatbot.api.ChatbotQuestionResponse;
 import com.ubuntu.ubuntu_app.application.chatbot.api.ResponseCategories;
@@ -25,22 +22,19 @@ import com.ubuntu.ubuntu_app.infrastructure.chatbot.entity.ChatbotQuestionEntity
 import com.ubuntu.ubuntu_app.infrastructure.chatbot.entity.ChatbotResponseEntity;
 import com.ubuntu.ubuntu_app.shared.support.StopWords;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatBotService implements ChatBotUseCase {
 
-    private final CosineSimilarity cosineSimilarity;
     private final ChatbotRepositoryPort chatbotRepository;
     private final ChatbotQuestionsRepositoryPort chatbotQuestionsRepository;
     private final ChatbotMapper chatbotMapper;
     private final ChatbotProperties chatbotProperties;
-    private final List<ScoredAnswer> scoredAnswers = new ArrayList<>();
+    private final QuestionMatcher questionMatcher = new QuestionMatcher(
+            StopWords.getLatinAmericanSpanishStopWords());
 
     @Override
     @Transactional(readOnly = true)
@@ -85,99 +79,24 @@ public class ChatBotService implements ChatBotUseCase {
     @Cacheable(value = "botResponses", key = "#question")
     @Transactional(readOnly = true)
     public Map<String, ?> answer(String question) {
-        String preprocessedQuestion = preprocessText(question);
         List<ChatbotResponseEntity> faqs;
         try {
             faqs = chatbotRepository.findAll();
         } catch (Exception e) {
             throw new IllegalStateException("An error occurred while processing your request.", e);
         }
-        scoredAnswers.clear();
-        var faqsFiltered = faqs.stream()
+        List<QuestionMatcher.Candidate> candidates = faqs.stream()
                 .filter(f -> f.getPossibleQuestions().stream().allMatch(q -> q.getCategory() == null))
-                .collect(Collectors.toList());
-        for (ChatbotResponseEntity faq : faqsFiltered) {
-            for (ChatbotQuestionEntity questionEntity : faq.getPossibleQuestions()) {
-                String preprocessedPossibleQuestion = preprocessText(questionEntity.getQuestion());
-                double cosineScore = calculateCosineSimilarity(preprocessedQuestion, preprocessedPossibleQuestion);
-                scoredAnswers.add(new ScoredAnswer(question, faq.getAnswer(), cosineScore));
-            }
-        }
-        Optional<ScoredAnswer> bestMatch = scoredAnswers.stream()
-                .filter(result -> result.similarityScore() >= chatbotProperties.similarity().threshold())
-                .max(Comparator.comparing(ScoredAnswer::similarityScore));
+                .flatMap(f -> f.getPossibleQuestions().stream()
+                        .map(q -> new QuestionMatcher.Candidate(q.getQuestion(), f.getAnswer())))
+                .toList();
+        var bestMatch = questionMatcher.bestMatch(question, candidates,
+                chatbotProperties.similarity().threshold());
         if (bestMatch.isPresent()) {
-            var answerObtained = bestMatch.get().response();
-            var similarityScore = bestMatch.get().similarityScore();
-            return ResponseMap.responseGeneric("Respuesta", new BotAnswer(answerObtained, similarityScore));
-        } else {
-            return ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta.");
+            var match = bestMatch.get();
+            return ResponseMap.responseGeneric("Respuesta", new BotAnswer(match.answer(), match.score()));
         }
-    }
-
-    /**
-     * Calculates the cosine similarity between two questions.
-     *
-     * @param question1 The first question (user input)
-     * @param question2 The second question (database)
-     * @return The cosine similarity score
-     */
-    private double calculateCosineSimilarity(String question1, String question2) {
-        Map<CharSequence, Integer> vector1 = toVector(question1);
-        Map<CharSequence, Integer> vector2 = toVector(question2);
-        double similarity = cosineSimilarity.cosineSimilarity(vector1, vector2);
-        return similarity;
-    }
-
-    /**
-     * Converts text to vector
-     *
-     * @param text
-     * @return converted text as vector
-     */
-    private Map<CharSequence, Integer> toVector(String text) {
-        Map<CharSequence, Integer> vector = new HashMap<>();
-        String[] tokens = text.split("\\s+");
-        for (String token : tokens) {
-            vector.put(token, vector.getOrDefault(token, 0) + 1);
-        }
-        return vector;
-    }
-
-    /**
-     * Preprocesses the input text by tokenizing, stemming, and removing stop words.
-     *
-     * @param question The input text to preprocess
-     * @return The preprocessed text
-     */
-    @SuppressWarnings("resource")
-    private String preprocessText(String question) {
-        if (question == null || question.isEmpty()) {
-            return "";
-        }
-        try (TokenStream tokenStream = new WhitespaceAnalyzer().tokenStream(null, new StringReader(question))) {
-            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
-            tokenStream.reset();
-            StringBuilder result = new StringBuilder();
-            while (tokenStream.incrementToken()) {
-                String term = charTermAttribute.toString().toLowerCase();
-                term = term.replaceAll("[¿?!*]", "");
-                if (!isStopWord(term)) {
-                    result.append(term).append(' ');
-                }
-            }
-            tokenStream.end();
-            return result.length() > 0 ? result.substring(0, result.length() - 1).toLowerCase() : "";
-        } catch (IOException e) {
-            return question.toLowerCase().trim();
-        }
-    }
-
-    private boolean isStopWord(String term) {
-        return StopWords.getLatinAmericanSpanishStopWords().contains(term.toLowerCase());
-    }
-
-    public record ScoredAnswer(String userQuestion, String response, double similarityScore) {
+        return ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta.");
     }
 
     public record BotAnswer(String answer, Double score) {
