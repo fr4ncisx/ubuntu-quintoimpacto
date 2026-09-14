@@ -1,12 +1,12 @@
-package com.ubuntu.ubuntu_app.infra.statuses;
+package com.ubuntu.ubuntu_app.shared.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.ubuntu.ubuntu_app.model.dto.ResponseCategories.MultiResponseDTO;
-import com.ubuntu.ubuntu_app.model.dto.ResponseCategories.MultiResponseList;
+import com.ubuntu.ubuntu_app.application.chatbot.api.ResponseCategories.MultiResponseDTO;
+import com.ubuntu.ubuntu_app.application.chatbot.api.ResponseCategories.MultiResponseList;
 
 public class ResponseMap {
     /*
@@ -36,7 +36,7 @@ public class ResponseMap {
         return responseMap;
     }
 
-    public static MultiResponseList MultiBotResponse(Set<String> messages) {
+    public static MultiResponseList multiBotAnswer(Set<String> messages) {
         List<MultiResponseDTO> responseList = new ArrayList<>();        
         for (String message : messages) {
             responseList.add(new MultiResponseDTO(message));
