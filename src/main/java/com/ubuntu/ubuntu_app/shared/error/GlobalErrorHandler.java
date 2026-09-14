@@ -33,23 +33,27 @@ public class GlobalErrorHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> emptyBodyOrBadJson(HttpMessageNotReadableException ex) {
         Map<String, String> errors = new HashMap<>();
-        if (ex.getMessage().contains("Required request body is missing")) {
+        String message = ex.getMessage() == null ? "" : ex.getMessage();
+        if (message.contains("Required request body is missing")) {
             errors.put("error", "body vacio");
         }
-        if (ex.getMessage().contains("was expecting comma to separate")) {
+        if (message.contains("was expecting comma to separate")) {
             errors.put("error", "Falta coma para separar algunos de los atributos");
         }
-        if (ex.getMessage().contains("expected close marker for Object")) {
+        if (message.contains("expected close marker for Object")) {
             errors.put("error", "Se espera cierre de llave al final");
         }
-        if (ex.getMessage().contains("Cannot deserialize value of type")) {
+        if (message.contains("Cannot deserialize value of type")) {
             errors.put("error", "Hubo un error al deserializar, se esperaba solo un objeto y no un arreglo");
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-        if (ex.getMessage().contains("Cannot construct instance of")) {
+        if (message.contains("Cannot construct instance of")) {
             errors.put("error", "Error de formato en la solicitud");
         }
-        return new ResponseEntity<>(errors, HttpStatus.CONFLICT);
+        if (errors.isEmpty()) {
+            errors.put("error", "Solicitud mal formada");
+        }
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -181,6 +185,13 @@ public class GlobalErrorHandler {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMessage());
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> unexpected(Exception ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Error interno del servidor");
+        return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private record ShowFieldErrors(String field, String message) {
