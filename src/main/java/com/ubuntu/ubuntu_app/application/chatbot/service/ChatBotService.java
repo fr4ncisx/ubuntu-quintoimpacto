@@ -72,19 +72,24 @@ public class ChatBotService implements ChatBotUseCase {
     }
 
     @Override
-    @Cacheable(value = "botResponses", key = "#question")
+    @Cacheable(value = "botResponses", key = "#question?.trim()?.toLowerCase() ?? 'empty'")
     @Transactional(readOnly = true)
     public Map<String, ?> answer(String question) {
         if (question != null && question.length() > 500) {
             throw new IllegalParameterException("Question must not exceed 500 characters");
         }
-        var bestMatch = questionMatcher.bestMatch(question, candidates(),
+        var normalized = question == null ? "" : question.trim().toLowerCase();
+        var bestMatch = questionMatcher.bestMatch(normalized, candidates(),
                 chatbotProperties.similarity().threshold());
         if (bestMatch.isPresent()) {
             var match = bestMatch.get();
             return ResponseMap.responseGeneric("Respuesta", new BotAnswer(match.answer(), match.score()));
         }
         return ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta.");
+    }
+
+    void invalidateCandidates() {
+        cachedCandidates = null;
     }
 
     private List<QuestionMatcher.Candidate> candidates() {

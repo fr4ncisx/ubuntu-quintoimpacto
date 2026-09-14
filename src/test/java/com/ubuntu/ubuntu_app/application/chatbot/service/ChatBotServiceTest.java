@@ -106,6 +106,41 @@ class ChatBotServiceTest {
     }
 
     @Test
+    void answerNormalizesCasing() {
+        ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("usa el boton contactar",
+                "como invertir microemprendimiento")));
+        var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
+                Mockito.mock(ChatbotMapper.class));
+
+        var upper = service.answer("COMO INVERTIR");
+        var mixed = service.answer("  Como Invertir  ");
+
+        assertEquals(service.answer("como invertir"), upper);
+        assertEquals(service.answer("como invertir"), mixed);
+    }
+
+    @Test
+    void answerReloadsCandidatesAfterInvalidation() {
+        ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("respuesta original",
+                "como invertir microemprendimiento")));
+        var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
+                Mockito.mock(ChatbotMapper.class));
+
+        var first = (ChatBotService.BotAnswer) service.answer("como invertir").get("Respuesta");
+        assertEquals("respuesta original", first.answer());
+
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("respuesta actualizada",
+                "como invertir microemprendimiento")));
+        service.invalidateCandidates();
+
+        var second = (ChatBotService.BotAnswer) service.answer("como invertir").get("Respuesta");
+        assertEquals("respuesta actualizada", second.answer());
+        Mockito.verify(repo, Mockito.times(2)).findAllWithQuestions();
+    }
+
+    @Test
     void answerRejectsOverlongQuestion() {
         var service = service(Mockito.mock(ChatbotRepositoryPort.class),
                 Mockito.mock(ChatbotQuestionsRepositoryPort.class),
