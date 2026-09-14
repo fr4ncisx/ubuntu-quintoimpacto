@@ -80,6 +80,19 @@ class RateLimitFilterTest {
     }
 
     @Test
+    void loginIsRateLimited() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+        MockHttpServletResponse last = null;
+        for (int i = 0; i < 11; i++) {
+            last = new MockHttpServletResponse();
+            filter.doFilter(request("/api/v1/auth/login", "3.3.3.3"), last, new MockFilterChain());
+        }
+
+        assertNotNull(last);
+        assertEquals(429, last.getStatus());
+    }
+
+    @Test
     void blockedRequestIsLogged() throws Exception {
         var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(RateLimitFilter.class);
         var appender = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();

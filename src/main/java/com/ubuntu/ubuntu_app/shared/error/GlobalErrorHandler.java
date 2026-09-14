@@ -105,6 +105,14 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(listOfErrors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<java.util.List<ShowFieldErrors>> constraintViolations(
+            jakarta.validation.ConstraintViolationException ex) {
+        var listOfErrors = ex.getConstraintViolations().stream()
+                .map(v -> new ShowFieldErrors(v.getPropertyPath().toString(), v.getMessage())).toList();
+        return new ResponseEntity<>(listOfErrors, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, String>> maximumUploadFileException(MaxUploadSizeExceededException ex) {
         Map<String, String> errors = new HashMap<>();

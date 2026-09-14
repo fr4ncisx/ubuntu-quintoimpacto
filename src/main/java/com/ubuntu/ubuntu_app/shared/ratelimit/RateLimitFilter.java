@@ -28,6 +28,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final List<Rule> RULES = List.of(
             new Rule("/contact/new-request", 10),
             new Rule("/api/v1/contact-requests", 10),
+            new Rule("/api/v1/auth/login", 10),
             new Rule("/chatbot", 30),
             new Rule("/api/v1/chatbot", 30),
             new Rule("/oauth2/", 20),
