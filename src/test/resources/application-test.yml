@@ -1,0 +1,22 @@
+# Perfil solo para tests. Los tests actuales no levantan contexto Spring;
+# estos valores dummy permiten que un futuro @SpringBootTest resuelva placeholders.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: false
+
+app:
+  seeding:
+    enabled: false
+
+POSTGRES_PASSWORD: test-only
+SECRET_KEY: test-only-not-a-secret
+CLOUDINARY: cloudinary://key:secret@cloud
+GOOGLE_CLIENT_ID: test-client-id
+GOOGLE_CLIENT_SECRET: test-client-secret
+EMAIL_SENDER: test@example.com
+EMAIL_SENDER_PASSWORD: test-password
+FRONTEND_IP: http://localhost:5173
+PROD_IP: http://localhost:5173
