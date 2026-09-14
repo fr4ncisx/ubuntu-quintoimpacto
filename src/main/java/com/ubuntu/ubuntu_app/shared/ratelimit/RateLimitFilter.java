@@ -19,8 +19,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final List<Rule> RULES = List.of(
@@ -46,6 +48,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (rule != null) {
             Bucket bucket = buckets.get(clientKey(request, rule), key -> newBucket(rule.perMinute()));
             if (!bucket.tryConsume(1)) {
+                log.warn("Rate limit exceeded: ip={} uri={}", clientKey(request, rule), uri);
                 response.setStatus(429);
                 response.setHeader("Retry-After", "60");
                 response.setHeader("Content-Type", "application/json");

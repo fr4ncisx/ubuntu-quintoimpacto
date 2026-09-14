@@ -99,6 +99,29 @@ class SecurityJWTFilterCookieTest {
     }
 
     @Test
+    void invalidTokenIsLogged() throws Exception {
+        var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(SecurityJWTFilter.class);
+        var appender = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            UserRepository repo = Mockito.mock(UserRepository.class);
+            var filter = filterWithSecret("0123456789abcdef0123456789abcdef", repo);
+
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/v1/users/7");
+            request.setCookies(new Cookie("ubuntu_jwt", "no-es-un-token"));
+            filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
+        } finally {
+            logger.detachAppender(appender);
+        }
+
+        assertTrue(appender.list.stream()
+                .anyMatch(e -> e.getLevel() == ch.qos.logback.classic.Level.WARN
+                        && e.getFormattedMessage().contains("/api/v1/users/7")));
+    }
+
+    @Test
     void expiredTokenOnPublicEndpointPassesThrough() throws Exception {
         UserRepository repo = Mockito.mock(UserRepository.class);
         var filter = filterWithSecret("0123456789abcdef0123456789abcdef", repo);

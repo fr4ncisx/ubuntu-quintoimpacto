@@ -21,9 +21,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class SecurityJWTFilter extends OncePerRequestFilter {
 
     private static final String PREFIX_TOKEN = "Bearer ";
@@ -85,11 +87,13 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             try {
                 email = jwtUtils.validateLocal(token);
             } catch (TokenExpiredException e) {
+                log.warn("Expired JWT: ip={} uri={}", request.getRemoteAddr(), uri);
                 response.setHeader(HEADER_LOGIN, "Token is expired");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"Error\": \"Authentication is required\"}");
                 return;
             } catch (JWTVerificationException e) {
+                log.warn("Invalid JWT: ip={} uri={}", request.getRemoteAddr(), uri);
                 response.setHeader(HEADER_LOGIN, "Invalid token");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"Error\": \"Authentication is required\"}");

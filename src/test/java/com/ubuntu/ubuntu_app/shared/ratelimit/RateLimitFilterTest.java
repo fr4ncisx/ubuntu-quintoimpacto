@@ -78,4 +78,26 @@ class RateLimitFilterTest {
 
         assertEquals(429, response.getStatus());
     }
+
+    @Test
+    void blockedRequestIsLogged() throws Exception {
+        var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(RateLimitFilter.class);
+        var appender = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            RateLimitFilter filter = new RateLimitFilter();
+            for (int i = 0; i < 11; i++) {
+                filter.doFilter(request("/contact/new-request", "6.6.6.6"),
+                        new MockHttpServletResponse(), new MockFilterChain());
+            }
+        } finally {
+            logger.detachAppender(appender);
+        }
+
+        assertTrue(appender.list.stream()
+                .anyMatch(e -> e.getLevel() == ch.qos.logback.classic.Level.WARN
+                        && e.getFormattedMessage().contains("6.6.6.6")));
+    }
 }
