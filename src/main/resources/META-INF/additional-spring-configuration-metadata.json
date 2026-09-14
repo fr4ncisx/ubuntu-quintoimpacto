@@ -1,8 +1,32 @@
 {"properties": [
   {
-    "name": "cors.ip.address",
-    "type": "String",
-    "description": "ip address to join frontend with backend"
+    "name": "app.mail.enabled",
+    "type": "java.lang.Boolean",
+    "description": "Activa el envio de mails (requiere EMAIL_SENDER y EMAIL_SENDER_PASSWORD reales)",
+    "defaultValue": false
+  },
+  {
+    "name": "app.seeding.enabled",
+    "type": "java.lang.Boolean",
+    "description": "Habilita los seeders CommandLineRunner (desactivar en prod)",
+    "defaultValue": false
+  },
+  {
+    "name": "app.security.google.post-login-redirect",
+    "type": "java.lang.String",
+    "description": "URL del frontend a la que se redirige tras el login OAuth2"
+  },
+  {
+    "name": "app.security.jwt.cookie-name",
+    "type": "java.lang.String",
+    "description": "Nombre de la cookie httpOnly con el JWT local",
+    "defaultValue": "ubuntu_jwt"
+  },
+  {
+    "name": "app.security.jwt.refresh-cookie-name",
+    "type": "java.lang.String",
+    "description": "Nombre de la cookie httpOnly con el refresh token",
+    "defaultValue": "ubuntu_refresh"
   },
   {
     "name": "jwt.secret.key",
@@ -16,18 +40,18 @@
   },
   {
     "name": "chatbot.similarity.threshold",
-    "type": "java.lang.String",
+    "type": "java.lang.Double",
     "description": "chatbot minimum score to be considered a valid question"
   },
   {
-    "name": "email.sender",
+    "name": "email.address",
     "type": "java.lang.String",
-    "description": "email'"
+    "description": "sender email address"
   },
   {
-    "name": "email.sender.password",
+    "name": "email.password",
     "type": "java.lang.String",
-    "description": "email password'"
+    "description": "sender email password"
   },
   {
     "name": "cors.koyeb",
@@ -36,8 +60,8 @@
   },
   {
     "name": "token.expiration",
-    "type": "java.lang.String",
-    "description": "A description for 'token.expiration'"
+    "type": "java.lang.Integer",
+    "description": "Minutos de validez del JWT local"
   },
   {
     "name": "cors.local",

@@ -1,20 +1,26 @@
 package com.ubuntu.ubuntu_app.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import com.cloudinary.Cloudinary;
+import com.ubuntu.ubuntu_app.shared.config.CloudinaryProperties;
 
-@Lazy
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class CloudinaryConfiguration {
 
-    @Value("${cloudinary.url-config}")
-    private String CLOUDINARY_URL_CONFIG;
-    
+    private final CloudinaryProperties cloudinaryProperties;
+
     @Bean
     public Cloudinary getInstance() {
-        return new Cloudinary(CLOUDINARY_URL_CONFIG);
+        return new Cloudinary(cloudinaryProperties.urlConfig());
+    }
+
+    @Bean
+    ObjectMapper objectMapper(){
+        return new ObjectMapper();
     }
 }

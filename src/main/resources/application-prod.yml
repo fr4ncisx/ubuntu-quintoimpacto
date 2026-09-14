@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+app:
+  seeding:
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.ubuntu: INFO
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+  web:
+    error:
+      include-stacktrace: always
+
+app:
+  seeding:
+    enabled: true
+
+logging:
+  level:
+    com.ubuntu: DEBUG

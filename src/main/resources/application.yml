@@ -1,0 +1,95 @@
+spring:
+  application:
+    name: ubuntu_app
+  config:
+    import: "optional:file:./variables.env[.properties]"
+  datasource:
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD}
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/ubuntu}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 3MB
+      max-request-size: 3MB
+  cache:
+    type: caffeine
+  threads:
+    virtual:
+      enabled: true
+  web:
+    error:
+      include-stacktrace: never
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope: openid,email,profile
+
+app:
+  seeding:
+    enabled: ${APP_SEEDING_ENABLED:false}
+  mail:
+    enabled: ${APP_MAIL_ENABLED:false}
+  security:
+    google:
+      post-login-redirect: ${FRONTEND_POST_LOGIN_URL:http://localhost:5173}
+    jwt:
+      cookie-name: ubuntu_jwt
+      refresh-cookie-name: ubuntu_refresh
+
+jwt:
+  secret:
+    key: ${SECRET_KEY}
+
+cloudinary:
+  url-config: ${CLOUDINARY}
+
+cors:
+  vercel: ${FRONTEND_IP}
+  koyeb: ${PROD_IP}
+  local: ${FRONTEND_LOCAL:http://localhost:5173}
+
+chatbot:
+  similarity:
+    threshold: 0.5
+
+email:
+  address: ${EMAIL_SENDER}
+  password: ${EMAIL_SENDER_PASSWORD}
+
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+token:
+  expiration: 15
+  refresh-expiration: 10080
+
+nominatim:
+  search: ${NOMINATIM_SEARCH:https://nominatim.openstreetmap.org/search}
+  reverse: ${NOMINATIM_REVERSE:https://nominatim.openstreetmap.org/reverse}
