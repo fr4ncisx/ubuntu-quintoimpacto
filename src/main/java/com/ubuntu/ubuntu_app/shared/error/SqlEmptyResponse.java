@@ -1,12 +1,8 @@
 package com.ubuntu.ubuntu_app.shared.error;
 
-import lombok.Getter;
-
-@Getter
-public class SqlEmptyResponse extends RuntimeException{
-    private String message;
+public class SqlEmptyResponse extends RuntimeException {
 
     public SqlEmptyResponse(String message) {
-        this.message = message;
-    }  
+        super(message);
+    }
 }
