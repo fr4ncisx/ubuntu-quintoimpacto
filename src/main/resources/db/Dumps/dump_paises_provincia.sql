@@ -4,32 +4,32 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
-CREATE TABLE IF NOT EXISTS `pais` (
+CREATE TABLE IF NOT EXISTS `countries` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
-DELETE FROM `pais`;
-/*!40000 ALTER TABLE `pais` DISABLE KEYS */;
-INSERT INTO `pais` (`id`, `nombre`) VALUES
+DELETE FROM `countries`;
+/*!40000 ALTER TABLE `countries` DISABLE KEYS */;
+INSERT INTO `countries` (`id`, `name`) VALUES
 	(1, 'Argentina'),
 	(2, 'Brasil'),
 	(3, 'Uruguay');
-/*!40000 ALTER TABLE `pais` ENABLE KEYS */;
+/*!40000 ALTER TABLE `countries` ENABLE KEYS */;
 
-CREATE TABLE IF NOT EXISTS `provincia` (
+CREATE TABLE IF NOT EXISTS `provinces` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) DEFAULT NULL,
-  `id_pais` bigint(20) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `country_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FKp37jnxd9htn7o8v195jm4uvre` (`id_pais`),
-  CONSTRAINT `FKp37jnxd9htn7o8v195jm4uvre` FOREIGN KEY (`id_pais`) REFERENCES `pais` (`id`)
+  KEY `FKp37jnxd9htn7o8v195jm4uvre` (`country_id`),
+  CONSTRAINT `FKp37jnxd9htn7o8v195jm4uvre` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
 
-DELETE FROM `provincia`;
-/*!40000 ALTER TABLE `provincia` DISABLE KEYS */;
-INSERT INTO `provincia` (`id`, `nombre`, `id_pais`) VALUES
+DELETE FROM `provinces`;
+/*!40000 ALTER TABLE `provinces` DISABLE KEYS */;
+INSERT INTO `provinces` (`id`, `name`, `country_id`) VALUES
 	(1, 'Buenos Aires', 1),
 	(2, 'Córdoba', 1),
 	(3, 'Santa Fe', 1),
@@ -61,7 +61,7 @@ INSERT INTO `provincia` (`id`, `nombre`, `id_pais`) VALUES
 	(29, 'Paysandu', 3),
 	(30, 'Maldonado', 3),
 	(31, 'Rivera', 3);
-/*!40000 ALTER TABLE `provincia` ENABLE KEYS */;
+/*!40000 ALTER TABLE `provinces` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

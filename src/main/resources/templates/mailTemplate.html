@@ -16,12 +16,12 @@
     <div th:unless="${micros == null or micros.isEmpty()}">
         <h2>Los Microemprendimientos nuevos son los siguientes </h2>
         <div th:each="micro : ${micros}" >
-                <strong>Nombre:</strong> <span th:text="${micro.nombre}">Nombre del Negocio</span> <br>
-                <strong>Pais:</strong> <span th:text="${micro.pais}">Pais</span><br>
-                <strong>Provincia:</strong> <span th:text="${micro.provincia}">provincia</span><br>
-                <strong>Ciudad:</strong> <span th:text="${micro.ciudad}">ciudad</span><br>
-                <strong>Descripcion:</strong> <span th:text="${micro.descripcion}">descripcion</span><br>
-                <strong>Categoria:</strong> <span th:text="${micro.categoria.nombre}">categoria</span><br>
+                <strong>Nombre:</strong> <span th:text="${micro.name}">Nombre del Negocio</span> <br>
+                <strong>Pais:</strong> <span th:text="${micro.country}">Pais</span><br>
+                <strong>Provincia:</strong> <span th:text="${micro.province}">provincia</span><br>
+                <strong>Ciudad:</strong> <span th:text="${micro.city}">ciudad</span><br>
+                <strong>Descripcion:</strong> <span th:text="${micro.description}">descripcion</span><br>
+                <strong>Categoria:</strong> <span th:text="${micro.category.name}">categoria</span><br>
                 <hr>
         </div>
     </div>
