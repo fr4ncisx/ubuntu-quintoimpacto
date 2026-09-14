@@ -9,5 +9,7 @@ public interface ChatbotRepositoryPort {
 
     List<ChatbotResponseEntity> findAll();
 
+    List<ChatbotResponseEntity> findAllWithQuestions();
+
     Optional<ChatbotResponseEntity> findById(Long id);
 }

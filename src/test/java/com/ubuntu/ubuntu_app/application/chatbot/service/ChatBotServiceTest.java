@@ -38,7 +38,7 @@ class ChatBotServiceTest {
     @Test
     void answerReturnsBestMatch() {
         ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
-        Mockito.when(repo.findAll()).thenReturn(List.of(faq("usa el boton contactar",
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("usa el boton contactar",
                 "como invertir microemprendimiento", "quiero invertir")));
         var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
                 Mockito.mock(ChatbotMapper.class));
@@ -48,12 +48,13 @@ class ChatBotServiceTest {
         assertTrue(result.containsKey("Respuesta"));
         var botAnswer = (ChatBotService.BotAnswer) result.get("Respuesta");
         assertEquals("usa el boton contactar", botAnswer.answer());
+        Mockito.verify(repo, Mockito.never()).findAll();
     }
 
     @Test
     void answerFallsBackWhenNothingMatches() {
         ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
-        Mockito.when(repo.findAll()).thenReturn(List.of(faq("usa el boton contactar",
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("usa el boton contactar",
                 "como invertir microemprendimiento")));
         var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
                 Mockito.mock(ChatbotMapper.class));
@@ -61,6 +62,47 @@ class ChatBotServiceTest {
         var result = service.answer("receta de empanadas criollas");
 
         assertEquals("Lo siento, no pude comprender tu pregunta.", result.get("Respuesta"));
+    }
+
+    @Test
+    void answerBuildsCandidatesOnlyOnce() {
+        ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("usa el boton contactar",
+                "como invertir microemprendimiento")));
+        var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
+                Mockito.mock(ChatbotMapper.class));
+
+        service.answer("como invertir");
+        service.answer("receta de empanadas criollas");
+        service.answer("como invertir microemprendimiento");
+
+        Mockito.verify(repo, Mockito.times(1)).findAllWithQuestions();
+    }
+
+    @Test
+    void answerBuildsCandidatesOnceUnderConcurrency() throws InterruptedException {
+        ChatbotRepositoryPort repo = Mockito.mock(ChatbotRepositoryPort.class);
+        Mockito.when(repo.findAllWithQuestions()).thenReturn(List.of(faq("usa el boton contactar",
+                "como invertir microemprendimiento")));
+        var service = service(repo, Mockito.mock(ChatbotQuestionsRepositoryPort.class),
+                Mockito.mock(ChatbotMapper.class));
+
+        int threads = 32;
+        var executor = java.util.concurrent.Executors.newFixedThreadPool(threads);
+        var latch = new java.util.concurrent.CountDownLatch(threads);
+        for (int i = 0; i < threads; i++) {
+            executor.submit(() -> {
+                try {
+                    service.answer("como invertir microemprendimiento");
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        assertTrue(latch.await(10, java.util.concurrent.TimeUnit.SECONDS));
+        executor.shutdown();
+
+        Mockito.verify(repo, Mockito.times(1)).findAllWithQuestions();
     }
 
     @Test

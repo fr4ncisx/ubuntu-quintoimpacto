@@ -35,6 +35,7 @@ public class ChatBotService implements ChatBotUseCase {
     private final ChatbotProperties chatbotProperties;
     private final QuestionMatcher questionMatcher = new QuestionMatcher(
             StopWords.getLatinAmericanSpanishStopWords());
+    private volatile List<QuestionMatcher.Candidate> cachedCandidates;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,12 +71,6 @@ public class ChatBotService implements ChatBotUseCase {
         return ResponseMap.botResponse(foundAnswer.get().getAnswer());
     }
 
-    /**
-     * Processes a user question and returns the best matching response.
-     *
-     * @param question The user's question
-     * @return Map containing the bot's response
-     */
     @Override
     @Cacheable(value = "botResponses", key = "#question")
     @Transactional(readOnly = true)
@@ -83,24 +78,41 @@ public class ChatBotService implements ChatBotUseCase {
         if (question != null && question.length() > 500) {
             throw new IllegalParameterException("Question must not exceed 500 characters");
         }
-        List<ChatbotResponseEntity> faqs;
-        try {
-            faqs = chatbotRepository.findAll();
-        } catch (Exception e) {
-            throw new IllegalStateException("An error occurred while processing your request.", e);
-        }
-        List<QuestionMatcher.Candidate> candidates = faqs.stream()
-                .filter(f -> f.getPossibleQuestions().stream().allMatch(q -> q.getCategory() == null))
-                .flatMap(f -> f.getPossibleQuestions().stream()
-                        .map(q -> new QuestionMatcher.Candidate(q.getQuestion(), f.getAnswer())))
-                .toList();
-        var bestMatch = questionMatcher.bestMatch(question, candidates,
+        var bestMatch = questionMatcher.bestMatch(question, candidates(),
                 chatbotProperties.similarity().threshold());
         if (bestMatch.isPresent()) {
             var match = bestMatch.get();
             return ResponseMap.responseGeneric("Respuesta", new BotAnswer(match.answer(), match.score()));
         }
         return ResponseMap.botResponse("Lo siento, no pude comprender tu pregunta.");
+    }
+
+    private List<QuestionMatcher.Candidate> candidates() {
+        var result = cachedCandidates;
+        if (result == null) {
+            synchronized (this) {
+                result = cachedCandidates;
+                if (result == null) {
+                    result = loadCandidates();
+                    cachedCandidates = result;
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<QuestionMatcher.Candidate> loadCandidates() {
+        List<ChatbotResponseEntity> faqs;
+        try {
+            faqs = chatbotRepository.findAllWithQuestions();
+        } catch (Exception e) {
+            throw new IllegalStateException("An error occurred while processing your request.", e);
+        }
+        return faqs.stream()
+                .filter(f -> f.getPossibleQuestions().stream().allMatch(q -> q.getCategory() == null))
+                .flatMap(f -> f.getPossibleQuestions().stream()
+                        .map(q -> new QuestionMatcher.Candidate(q.getQuestion(), f.getAnswer())))
+                .toList();
     }
 
     public record BotAnswer(String answer, Double score) {

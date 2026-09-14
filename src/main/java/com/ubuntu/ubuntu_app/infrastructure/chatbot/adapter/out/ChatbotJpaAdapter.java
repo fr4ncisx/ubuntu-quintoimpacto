@@ -23,6 +23,11 @@ public class ChatbotJpaAdapter implements ChatbotRepositoryPort {
     }
 
     @Override
+    public List<ChatbotResponseEntity> findAllWithQuestions() {
+        return repository.findAllWithQuestions();
+    }
+
+    @Override
     public Optional<ChatbotResponseEntity> findById(Long id) {
         return repository.findById(id);
     }
