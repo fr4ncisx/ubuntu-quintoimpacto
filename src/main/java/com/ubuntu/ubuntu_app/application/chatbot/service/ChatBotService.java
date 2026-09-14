@@ -39,10 +39,10 @@ public class ChatBotService implements ChatBotUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<ChatbotQuestionResponse> findQuestionsByCategory(String category) {
-        if (category.isBlank()) {
+        if (category == null || category.isBlank()) {
             throw new IllegalParameterException("Please write a category to search questions");
         }
-        var questionsFound = chatbotQuestionsRepository.findQuestionsByCategory(category);
+        var questionsFound = chatbotQuestionsRepository.findQuestionsByCategory(category.trim().toUpperCase());
         if (questionsFound.isEmpty()) {
             throw new SqlEmptyResponse("No questions found");
         }
@@ -58,8 +58,9 @@ public class ChatBotService implements ChatBotUseCase {
         if (foundQuestion.isEmpty()) {
             throw new SqlEmptyResponse("There are no questions with that id");
         }
-        var getFKofAnswer = chatbotQuestionsRepository.findFKofAnswers(id);
-        var foundAnswer = chatbotRepository.findById(getFKofAnswer.get());
+        var answerId = chatbotQuestionsRepository.findFKofAnswers(id)
+                .orElseThrow(() -> new SqlEmptyResponse("There are no answers with that foreign key"));
+        var foundAnswer = chatbotRepository.findById(answerId);
         if (foundAnswer.isEmpty()) {
             throw new SqlEmptyResponse("There are no answers with that foreign key");
         }
@@ -79,6 +80,9 @@ public class ChatBotService implements ChatBotUseCase {
     @Cacheable(value = "botResponses", key = "#question")
     @Transactional(readOnly = true)
     public Map<String, ?> answer(String question) {
+        if (question != null && question.length() > 500) {
+            throw new IllegalParameterException("Question must not exceed 500 characters");
+        }
         List<ChatbotResponseEntity> faqs;
         try {
             faqs = chatbotRepository.findAll();
