@@ -1,19 +1,44 @@
+# ---------- Git / CI ----------
 .git
-.idea
-.vscode
-.mvn
-target
-node_modules
-src/test
-surefire-reports
+.github/
+.gitignore
+.dockerignore
+Dockerfile*
 
-.env
+# ---------- IDE / OS ----------
+.idea/
+.vscode/
+*.iml
+*.iws
+.DS_Store
 
-compose.yml
+# ---------- Maven ----------
+.mvn/
+mvnw
+mvnw.cmd
+target/
+surefire-reports/
 
+# ---------- Node (no aplica a este backend Java) ----------
+node_modules/
+
+# ---------- Secrets: nunca mandar al daemon ----------
+*.env
+.env*
+variables.env*
+!variables.env-template
+
+# ---------- Compose / docs / temporales ----------
+compose*.yml
+docker-compose*.yml
+README*
+HELP.md
 *.log
 *.tmp
 *.swp
+*.pem
+*.key
 
-README*
-HELP.md
+# ---------- Tests (acoplado a -DskipTests en Dockerfile stage build) ----------
+# Si se quita -DskipTests del build, quitar esta linea.
+src/test/

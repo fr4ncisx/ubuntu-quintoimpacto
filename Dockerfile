@@ -27,7 +27,7 @@ RUN --mount=type=cache,id=maven,target=/root/.m2 \
 FROM eclipse-temurin:21-alpine-3.23 AS jre-builder
 
 RUN jlink \
-    --add-modules java.base,java.logging,java.naming,java.desktop,java.management,java.security.jgss,java.instrument,java.sql,java.xml,java.compiler,java.net.http,jdk.unsupported,jdk.crypto.ec,jdk.zipfs \
+    --add-modules java.base,java.logging,java.naming,java.desktop,java.management,java.security.jgss,java.instrument,java.sql,java.xml,java.compiler,java.net.http,jdk.unsupported,jdk.crypto.ec,jdk.zipfs,jdk.net \
     --strip-debug \
     --no-man-pages \
     --no-header-files \
@@ -65,5 +65,8 @@ COPY --from=build --chown=spring:spring --chmod=0444 /workspace/app.jar /app/app
 USER spring:spring
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD wget -qO /dev/null http://127.0.0.1:8080/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
