@@ -2,6 +2,8 @@ package com.ubuntu.ubuntu_app.shared.geo;
 
 import java.text.DecimalFormat;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,21 +31,33 @@ public class GeoDistanceService implements GeoPort {
         return cleanDecimalFormat(total, "#.##");
     }
 
+    @Cacheable(value = "nominatimCache", key = "#province + ',' + #city + ',' + #country")
     public Nominatim getCoordinatesByName(String province, String city, String country) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromUriString(nominatimProperties.search())
-            .queryParam("city", city)
-            .queryParam("state", province)
-            .queryParam("country", country)
-            .queryParam("format", "json")
-            .queryParam("limit", 1)
-            .build(false)
-            .toUriString();
-        Nominatim[] response = restTemplate.getForObject(url, Nominatim[].class);
-        if (response == null || response.length == 0) {
+        try {
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(2000);
+            factory.setReadTimeout(3000);
+            RestTemplate restTemplate = new RestTemplate(factory);
+            restTemplate.getInterceptors().add((request, body, execution) -> {
+                request.getHeaders().set("User-Agent", "Ubuntu-App/1.4.0");
+                return execution.execute(request, body);
+            });
+            String url = UriComponentsBuilder.fromUriString(nominatimProperties.search())
+                .queryParam("city", city)
+                .queryParam("state", province)
+                .queryParam("country", country)
+                .queryParam("format", "json")
+                .queryParam("limit", 1)
+                .build(false)
+                .toUriString();
+            Nominatim[] response = restTemplate.getForObject(url, Nominatim[].class);
+            if (response == null || response.length == 0) {
+                return null;
+            }
+            return response[0];
+        } catch (Exception e) {
             return null;
         }
-        return response[0];
     }
 
     private double cleanDecimalFormat(double d, String pattern) {

@@ -14,6 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,15 +37,16 @@ public class ContactRequestV1Controller {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ContactRequestSummary>>> listByReviewStatus(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<ContactRequestSummary>>>> listByReviewStatus(
             @RequestParam boolean reviewed,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<ContactRequestSummary> assembler) {
         var pageable = Pages.of(page, size, Sort.by("id"));
         if (reviewed) {
-            return ResponseEntity.ok(ApiResponse.ok(contactRequestService.findReviewed(pageable)));
+            return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(contactRequestService.findReviewed(pageable))));
         }
-        return ResponseEntity.ok(ApiResponse.ok(contactRequestService.findUnreviewed(pageable)));
+        return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(contactRequestService.findUnreviewed(pageable))));
     }
 
     @GetMapping("/{id}")

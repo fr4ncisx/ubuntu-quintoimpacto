@@ -223,7 +223,6 @@ public class MicrobusinessService implements MicrobusinessUseCase {
 
     @Override
     @Cacheable(value = "coordinatesCache", key = "#lat + ',' + #lon")
-    @Transactional(readOnly = true)
     public List<NearbyMicrobusinessResponse> findNearby(double lat, double lon) {
         var listOfMicro = microbusinessRepository.findByActiveTrueOrderByCreatedDateDesc();
         if (listOfMicro.isEmpty()) {

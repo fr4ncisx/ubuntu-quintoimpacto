@@ -16,6 +16,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,21 +53,25 @@ public class MicrobusinessV1Controller {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<MicrobusinessSummary>>> searchByName(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<MicrobusinessSummary>>>> searchByName(
             @RequestParam String name,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(ApiResponse.ok(microbusinessService.findByName(name,
-                Pages.of(page, size, Sort.by("id")))));
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<MicrobusinessSummary> assembler) {
+        Page<MicrobusinessSummary> result = microbusinessService.findByName(name,
+                Pages.of(page, size, Sort.by("id")));
+        return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(result)));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<MicrobusinessCategorySummary>>> findByCategory(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<MicrobusinessCategorySummary>>>> findByCategory(
             @RequestParam String category,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(ApiResponse.ok(microbusinessService.findAll(category,
-                Pages.of(page, size, Sort.by("id")))));
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<MicrobusinessCategorySummary> assembler) {
+        Page<MicrobusinessCategorySummary> result = microbusinessService.findAll(category,
+                Pages.of(page, size, Sort.by("id")));
+        return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(result)));
     }
 
     @PutMapping("/{id}/visibility")
@@ -80,20 +87,24 @@ public class MicrobusinessV1Controller {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<Page<MicrobusinessSummary>>> findAll(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<MicrobusinessSummary>>>> findAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(ApiResponse.ok(microbusinessService.findAllActive(
-                Pages.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate")))));
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<MicrobusinessSummary> assembler) {
+        Page<MicrobusinessSummary> result = microbusinessService.findAllActive(
+                Pages.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate")));
+        return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(result)));
     }
 
     @GetMapping("/by-status")
-    public ResponseEntity<ApiResponse<Page<MicrobusinessSummary>>> findByStatus(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<MicrobusinessSummary>>>> findByStatus(
             @RequestParam boolean active,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(ApiResponse.ok(microbusinessService.findByActive(active,
-                Pages.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate")))));
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<MicrobusinessSummary> assembler) {
+        Page<MicrobusinessSummary> result = microbusinessService.findByActive(active,
+                Pages.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate")));
+        return ResponseEntity.ok(ApiResponse.ok(assembler.toModel(result)));
     }
 
     @GetMapping("/statistics/monthly")
