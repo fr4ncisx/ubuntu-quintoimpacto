@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springdoc.core.customizers.GlobalOperationCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.web.method.HandlerMethod;
 
 import com.ubuntu.ubuntu_app.infrastructure.auth.web.AuthApiDocs;
@@ -62,7 +63,7 @@ class OpenApiBeansTest {
     @Test
     void userCustomizerDocumentsOwnControllerOnly() throws Exception {
         HandlerMethod ownMethod = new HandlerMethod(new UserV1Controller(null),
-                UserV1Controller.class.getMethod("getAllUsers", int.class, int.class));
+                UserV1Controller.class.getMethod("getAllUsers", int.class, int.class, PagedResourcesAssembler.class));
         HandlerMethod foreignMethod = new HandlerMethod(new CountryV1Controller(null, null),
                 CountryV1Controller.class.getMethod("findAllCountries"));
 

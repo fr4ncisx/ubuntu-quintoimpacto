@@ -12,7 +12,7 @@ app:
     enabled: false
 
 POSTGRES_PASSWORD: test-only
-SECRET_KEY: test-only-not-a-secret
+SECRET_KEY: kmqM6I0dsc2No1O+Qalwv3zYi22ko6ReCXq9/7MYhKQ=
 CLOUDINARY: cloudinary://key:secret@cloud
 GOOGLE_CLIENT_ID: test-client-id
 GOOGLE_CLIENT_SECRET: test-client-secret
