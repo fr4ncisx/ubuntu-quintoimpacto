@@ -12,24 +12,57 @@ import org.junit.jupiter.api.Test;
 
 class QuestionMatcherTest {
 
-    private static final Set<String> STOP_WORDS = Set.of("el", "la", "de", "que", "en", "y");
+    private static final Set<String> STOP_WORDS = Set.of(
+            "el", "la", "de", "que", "en", "y", "un", "una", "los", "las", "como", "quiero", "puedo"
+    );
 
     private final QuestionMatcher matcher = new QuestionMatcher(STOP_WORDS);
 
     private static List<QuestionMatcher.Candidate> candidates() {
         return List.of(
-                new QuestionMatcher.Candidate("como invertir microemprendimiento", "usa el boton contactar"),
+                new QuestionMatcher.Candidate("como invertir en microemprendimiento", "usa el boton contactar"),
+                new QuestionMatcher.Candidate("como registrarse en la plataforma", "debes completar el formulario de registro"),
                 new QuestionMatcher.Candidate("hola buenas", "hola, en que ayudo"),
-                new QuestionMatcher.Candidate("que es ubuntu", "empresa de financiamiento sostenible"));
+                new QuestionMatcher.Candidate("que es ubuntu", "empresa de financiamiento sostenible"),
+                new QuestionMatcher.Candidate("quienes somos", "empresa de financiamiento sostenible"),
+                new QuestionMatcher.Candidate("registrar", "debes completar el formulario de registro"),
+                new QuestionMatcher.Candidate("inversion", "usa el boton contactar"),
+                new QuestionMatcher.Candidate("buscar", "explorar microemprendimientos"),
+                new QuestionMatcher.Candidate("contacto", "usa el boton contactar"),
+                new QuestionMatcher.Candidate("ayuda", "asistencia"));
     }
 
     @Test
     void exactMatchScoresOne() {
-        var match = matcher.bestMatch("como invertir microemprendimiento", candidates(), 0.5);
+        var match = matcher.bestMatch("como invertir en microemprendimiento", candidates(), 0.5);
 
         assertTrue(match.isPresent());
         assertEquals("usa el boton contactar", match.get().answer());
         assertEquals(1.0, match.get().score(), 1e-9);
+    }
+
+    @Test
+    void stemmingMatchesDifferentConjugations() {
+        var match = matcher.bestMatch("quiero registrarme", candidates(), 0.5);
+
+        assertTrue(match.isPresent());
+        assertEquals("debes completar el formulario de registro", match.get().answer());
+    }
+
+    @Test
+    void accentInsensitivityMatchesCandidate() {
+        var match = matcher.bestMatch("¿cómo invertir en microemprendimiento?", candidates(), 0.5);
+
+        assertTrue(match.isPresent());
+        assertEquals("usa el boton contactar", match.get().answer());
+    }
+
+    @Test
+    void minorTypoIsToleratedWithFuzzyMatching() {
+        var match = matcher.bestMatch("como registrarze en la plataforma", candidates(), 0.5);
+
+        assertTrue(match.isPresent());
+        assertEquals("debes completar el formulario de registro", match.get().answer());
     }
 
     @Test
@@ -70,7 +103,7 @@ class QuestionMatcherTest {
         try (var pool = Executors.newFixedThreadPool(8)) {
             List<Callable<Boolean>> tasks = IntStream.range(0, 100)
                     .mapToObj(i -> (Callable<Boolean>) () -> {
-                        String query = (i % 2 == 0) ? "como invertir microemprendimiento" : "hola buenas";
+                        String query = (i % 2 == 0) ? "como invertir en microemprendimiento" : "hola buenas";
                         String expected = (i % 2 == 0) ? "usa el boton contactar" : "hola, en que ayudo";
                         return matcher.bestMatch(query, candidates(), 0.5)
                                 .map(m -> m.answer().equals(expected))
@@ -81,5 +114,22 @@ class QuestionMatcherTest {
                 assertTrue(future.get());
             }
         }
+    }
+
+    @Test
+    void boundaryQueriesWithAlienContextDoNotTriggerFalsePositives() {
+        assertTrue(matcher.bestMatch("quiero registrar un auto 0km", candidates(), 0.5).isEmpty());
+        assertTrue(matcher.bestMatch("inversion en criptomonedas y bitcoin", candidates(), 0.5).isEmpty());
+        assertTrue(matcher.bestMatch("quiero buscar trabajo en una fabrica", candidates(), 0.5).isEmpty());
+        assertTrue(matcher.bestMatch("contacto extraterrestre ovni", candidates(), 0.5).isEmpty());
+        assertTrue(matcher.bestMatch("necesito ayuda con mi tarea de matematicas", candidates(), 0.5).isEmpty());
+    }
+
+    @Test
+    void allStopWordsQueryPreservesTokensAndMatchesCandidate() {
+        var match = matcher.bestMatch("¿quienes somos?", candidates(), 0.5);
+
+        assertTrue(match.isPresent());
+        assertEquals("empresa de financiamiento sostenible", match.get().answer());
     }
 }

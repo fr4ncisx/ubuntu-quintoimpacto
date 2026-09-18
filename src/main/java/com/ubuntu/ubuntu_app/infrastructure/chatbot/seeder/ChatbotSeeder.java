@@ -80,7 +80,20 @@ public class ChatbotSeeder implements CommandLineRunner {
                         new ChatbotQuestionEntity(null, "¿Una vez enviada la solicitud de contacto de un Microemprendimiento, en cuánto tiempo recibiría una respuesta?", ChatbotCategory.FREQUENT_QUESTIONS))
                 ),
                 new ChatbotResponseEntity(null, "Si, se requiere la registración de la empresa u organización interesada en invertir, en el organismo contralor correspondiente, y no presentar irregularidades.", Arrays.asList(
-                        new ChatbotQuestionEntity(null, "¿Hay requisitos para ser inversor?", ChatbotCategory.FREQUENT_QUESTIONS))
+                        new ChatbotQuestionEntity(null, "¿Hay requisitos para ser inversor?", ChatbotCategory.FREQUENT_QUESTIONS),
+                        new ChatbotQuestionEntity(null, "¿Qué requisitos necesito?", null),
+                        new ChatbotQuestionEntity(null, "requisitos", null),
+                        new ChatbotQuestionEntity(null, "requisito", null),
+                        new ChatbotQuestionEntity(null, "que requisitos necesito", null))
+                ),
+                new ChatbotResponseEntity(null, "En Ubuntu conectamos microemprendimientos de impacto con inversores para su financiamiento. Si deseas postular tu emprendimiento o recibir financiamiento, contactanos a semilleroubuntu.dev@gmail.com o a través del formulario de contacto.", Arrays.asList(
+                        new ChatbotQuestionEntity(null, "¿Cómo solicitar un microcrédito?", null),
+                        new ChatbotQuestionEntity(null, "solicitar microcrédito", null),
+                        new ChatbotQuestionEntity(null, "microcrédito", null),
+                        new ChatbotQuestionEntity(null, "microcredito", null),
+                        new ChatbotQuestionEntity(null, "solicitar financiamiento", null),
+                        new ChatbotQuestionEntity(null, "financiamiento", null),
+                        new ChatbotQuestionEntity(null, "credito", null))
                 ),
                 new ChatbotResponseEntity(null, "Si, pero estos varían según el emprendimiento, y de las necesidades de cada uno en particular.", Arrays.asList(
                         new ChatbotQuestionEntity(null, "¿Hay un mínimo o máximo de inversión?", ChatbotCategory.FREQUENT_QUESTIONS))

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ubuntu.ubuntu_app.shared.config.ChatbotProperties;
-
 import com.ubuntu.ubuntu_app.application.chatbot.port.in.ChatBotUseCase;
 import com.ubuntu.ubuntu_app.application.chatbot.port.out.ChatbotQuestionsRepositoryPort;
 import com.ubuntu.ubuntu_app.application.chatbot.port.out.ChatbotRepositoryPort;
@@ -18,11 +17,11 @@ import com.ubuntu.ubuntu_app.shared.chatbot.QuestionMatcher;
 import com.ubuntu.ubuntu_app.infrastructure.chatbot.adapter.mapper.ChatbotMapper;
 import com.ubuntu.ubuntu_app.application.chatbot.api.ChatbotQuestionResponse;
 import com.ubuntu.ubuntu_app.application.chatbot.api.ResponseCategories;
-import com.ubuntu.ubuntu_app.infrastructure.chatbot.entity.ChatbotQuestionEntity;
 import com.ubuntu.ubuntu_app.infrastructure.chatbot.entity.ChatbotResponseEntity;
 import com.ubuntu.ubuntu_app.shared.support.StopWords;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -72,7 +71,7 @@ public class ChatBotService implements ChatBotUseCase {
     }
 
     @Override
-    @Cacheable(value = "botResponses", key = "#question?.trim()?.toLowerCase() ?? 'empty'")
+    @Cacheable(value = "botResponses", key = "#question?.trim()?.toLowerCase() ?: 'empty'")
     @Transactional(readOnly = true)
     public Map<String, ?> answer(String question) {
         if (question != null && question.length() > 500) {
@@ -114,9 +113,15 @@ public class ChatBotService implements ChatBotUseCase {
             throw new IllegalStateException("An error occurred while processing your request.", e);
         }
         return faqs.stream()
-                .filter(f -> f.getPossibleQuestions().stream().allMatch(q -> q.getCategory() == null))
-                .flatMap(f -> f.getPossibleQuestions().stream()
-                        .map(q -> new QuestionMatcher.Candidate(q.getQuestion(), f.getAnswer())))
+                .flatMap(f -> {
+                    String answer = f.getAnswer();
+                    if ("Respuesta categorias".equalsIgnoreCase(answer)) {
+                        answer = "Las categorías de microemprendimientos son: Economía Popular, Alimentación y Empresas de Impacto.";
+                    }
+                    final String resolvedAnswer = answer;
+                    return f.getPossibleQuestions().stream()
+                            .map(q -> new QuestionMatcher.Candidate(q.getQuestion(), resolvedAnswer));
+                })
                 .toList();
     }
 
