@@ -36,6 +36,17 @@ public class RateLimitFilter extends OncePerRequestFilter {
             new Rule("/publications/click", 60),
             new Rule("/api/v1/publications/", 120));
 
+    private final boolean trustForwardedHeader;
+
+    public RateLimitFilter() {
+        this(false);
+    }
+
+    public RateLimitFilter(
+            @org.springframework.beans.factory.annotation.Value("${app.security.rate-limit.trust-forwarded-headers:false}") boolean trustForwardedHeader) {
+        this.trustForwardedHeader = trustForwardedHeader;
+    }
+
     private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .maximumSize(10_000)
@@ -74,10 +85,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientKey(HttpServletRequest request, Rule rule) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        String ip = forwarded != null && !forwarded.isBlank()
-                ? forwarded.split(",")[0].trim()
-                : request.getRemoteAddr();
+        String remoteAddr = request.getRemoteAddr();
+        String ip = remoteAddr;
+        if (trustForwardedHeader) {
+            String forwarded = request.getHeader("X-Forwarded-For");
+            if (forwarded != null && !forwarded.isBlank()) {
+                ip = forwarded.split(",")[0].trim();
+            }
+        }
         return rule.prefix() + "|" + ip;
     }
 

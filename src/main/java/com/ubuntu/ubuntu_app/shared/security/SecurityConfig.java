@@ -41,23 +41,22 @@ public class SecurityConfig {
     SecurityFilterChain apiChain(HttpSecurity security, SecurityJWTFilter jwtFilter,
             RateLimitFilter rateLimitFilter) throws Exception {
         CookieCsrfTokenRepository csrfRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        csrfRepository.setCookieCustomizer(cookie -> cookie.sameSite("None").secure(true).path("/"));
+        csrfRepository.setCookieCustomizer(cookie -> cookie.sameSite("Lax").secure(true).path("/"));
         return security
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/api/v1/auth/login"))
+                        .ignoringRequestMatchers("/api/v1/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authRequest -> {
-                    // Swagger
                     authRequest.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
                             "/swagger-ui/**").permitAll();
-                    // Health probe
-                    authRequest.requestMatchers("/actuator/health").permitAll();
-                    // Versioned API v1 (noun-based paths)
+                    authRequest.requestMatchers("/actuator/health", "/actuator/health/**",
+                            "/actuator/prometheus", "/actuator/info").permitAll();
                     authRequest.requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/refresh",
                             "/api/v1/auth/logout").permitAll();
+                    authRequest.requestMatchers(HttpMethod.GET, "/api/v1/auth/me").hasAnyRole("ADMIN", "USER");
                     authRequest.requestMatchers(HttpMethod.GET, "/api/v1/countries", "/api/v1/provinces")
                             .permitAll();
                     authRequest.requestMatchers(HttpMethod.GET, "/api/v1/chatbot/**").permitAll();
@@ -70,9 +69,10 @@ public class SecurityConfig {
                             "/api/v1/contact-requests").permitAll();
                     authRequest.requestMatchers("/api/v1/publications/**").hasRole("ADMIN");
                     authRequest.requestMatchers(HttpMethod.GET, "/api/v1/microbusiness/search",
-                            "/api/v1/microbusiness/near", "/api/v1/microbusiness").permitAll();
+                            "/api/v1/microbusiness/near", "/api/v1/microbusiness", "/api/v1/microbusiness/all").permitAll();
                     authRequest.requestMatchers("/api/v1/microbusiness/**").hasRole("ADMIN");
                     authRequest.requestMatchers("/api/v1/contact-requests/**").hasRole("ADMIN");
+                    authRequest.requestMatchers(HttpMethod.PUT, "/api/v1/users/*/deactivate").hasRole("ADMIN");
                     authRequest.requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN");
                     authRequest.requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMIN");
                     authRequest.requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "USER");

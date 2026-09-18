@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class UserService implements UserUseCase {    
+public class UserService implements UserUseCase {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -39,7 +39,7 @@ public class UserService implements UserUseCase {
         userRepository.save(user);
         return ResponseMap.createResponse("Creado exitosamente");
     }
-    
+
     @Transactional
     public Map<String, String> update(UpdateUserRequest request, String email) {
         verifyCanModifyUser(email);
@@ -62,6 +62,15 @@ public class UserService implements UserUseCase {
         }
     }
 
+    private void verifyIsAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        if (!isAdmin) {
+            throw new AccessDeniedException("No autorizado para desactivar usuarios");
+        }
+    }
+
     @Transactional
     public Map<String, String> updateById(Long id, UpdateUserRequest request) {
         Optional<UserEntity> userObtained = userRepository.findById(id);
@@ -75,6 +84,7 @@ public class UserService implements UserUseCase {
 
     @Transactional
     public Map<String, String> deactivate(Long idUserToDeactivate) {
+        verifyIsAdmin();
         Optional<UserEntity> user = userRepository.findById(idUserToDeactivate);
         if (!user.isPresent()) {
             throw new SqlEmptyResponse("El usuario no existe en la base de datos");
@@ -92,18 +102,16 @@ public class UserService implements UserUseCase {
     @Transactional(readOnly = true)
     public List<UserResponse> findAll() {
         List<UserEntity> users = userRepository.findAll();
-        return users.stream().map(userMapper::toFetchDto)
-        .toList();
+        return users.stream().map(userMapper::toFetchDto).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<UserResponse> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .map(userMapper::toFetchDto);
+        return userRepository.findAll(pageable).map(userMapper::toFetchDto);
     }
 
-    public String [] findAdminEmails(){
+    public String[] findAdminEmails() {
         List<String> adminEmails = userRepository.findAdminEmails();
         return adminEmails.toArray(new String[0]);
     }
@@ -111,10 +119,9 @@ public class UserService implements UserUseCase {
     @Transactional(readOnly = true)
     public UpdateUserRequest findByEmail(String email) {
         var userFound = userRepository.findByEmail(email);
-        if(!userFound.isPresent()){
+        if (!userFound.isPresent()) {
             throw new SqlEmptyResponse("No user found with email: " + email);
         }
         return userMapper.toUpdateDto(userFound.get());
     }
-
 }

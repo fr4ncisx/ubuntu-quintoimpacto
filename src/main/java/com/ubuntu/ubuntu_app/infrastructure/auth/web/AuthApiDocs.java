@@ -20,7 +20,9 @@ public class AuthApiDocs {
             "logout",
             new EndpointDoc("Logout", "Revokes refresh token and clears cookies", "Auth"),
             "refresh",
-            new EndpointDoc("Refresh tokens", "Rotates the refresh token and issues a new pair", "Auth"));
+            new EndpointDoc("Refresh tokens", "Rotates the refresh token and issues a new pair", "Auth"),
+            "me",
+            new EndpointDoc("Current user", "Returns authenticated user profile from active cookie session", "Auth"));
 
     @Bean
     public GroupedOpenApi authApi() {

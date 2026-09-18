@@ -65,7 +65,7 @@ class RateLimitFilterTest {
 
     @Test
     void forwardedHeaderIsUsedAsClientIp() throws Exception {
-        RateLimitFilter filter = new RateLimitFilter();
+        RateLimitFilter filter = new RateLimitFilter(true);
         for (int i = 0; i < 10; i++) {
             MockHttpServletRequest request = request("/contact/new-request", "10.0.0.1");
             request.addHeader("X-Forwarded-For", "7.7.7.7, 10.0.0.1");
@@ -73,6 +73,22 @@ class RateLimitFilterTest {
         }
         MockHttpServletRequest blocked = request("/contact/new-request", "10.0.0.1");
         blocked.addHeader("X-Forwarded-For", "7.7.7.7, 10.0.0.1");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        filter.doFilter(blocked, response, new MockFilterChain());
+
+        assertEquals(429, response.getStatus());
+    }
+
+    @Test
+    void forwardedHeaderIsIgnoredByDefault() throws Exception {
+        RateLimitFilter filter = new RateLimitFilter();
+        for (int i = 0; i < 10; i++) {
+            MockHttpServletRequest request = request("/contact/new-request", "10.0.0.1");
+            request.addHeader("X-Forwarded-For", "7.7.7." + i);
+            filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
+        }
+        MockHttpServletRequest blocked = request("/contact/new-request", "10.0.0.1");
+        blocked.addHeader("X-Forwarded-For", "9.9.9.9");
         MockHttpServletResponse response = new MockHttpServletResponse();
         filter.doFilter(blocked, response, new MockFilterChain());
 

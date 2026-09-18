@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SecurityJWTFilter extends OncePerRequestFilter {
 
-    private static final String PREFIX_TOKEN = "Bearer ";
-    private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String HEADER_STATUS = "Status";
     private static final String HEADER_LOGIN = "Login";
     private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
@@ -47,10 +45,13 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
             "/api/v1/contact-requests",
             "/swagger-ui.html",
             "/v3/api-docs",
-            "/actuator/health");
+            "/actuator/health",
+            "/actuator/prometheus",
+            "/actuator/info");
     private static final List<String> PUBLIC_PATH_PREFIXES = Arrays.asList(
             "/swagger-ui/",
             "/v3/api-docs/",
+            "/actuator/health/",
             "/api/v1/publications/",
             "/api/v1/microbusiness/",
             "/api/v1/contact-requests/",
@@ -72,32 +73,27 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String uri = request.getRequestURI();
-        if (isPublicUri(uri)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         String token = resolveToken(request);
-        if (token == null) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"Error\": \"Authentication is required\"}");
-            return;
-        }
         if (token != null) {
-            String email;
+            String email = null;
             try {
                 email = jwtUtils.validateLocal(token);
             } catch (TokenExpiredException e) {
-                log.warn("Expired JWT: ip={} uri={}", request.getRemoteAddr(), uri);
-                response.setHeader(HEADER_LOGIN, "Token is expired");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"Error\": \"Authentication is required\"}");
-                return;
+                if (!isPublicUri(uri)) {
+                    log.warn("Expired JWT: ip={} uri={}", request.getRemoteAddr(), uri);
+                    response.setHeader(HEADER_LOGIN, "Token is expired");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+                    return;
+                }
             } catch (JWTVerificationException e) {
-                log.warn("Invalid JWT: ip={} uri={}", request.getRemoteAddr(), uri);
-                response.setHeader(HEADER_LOGIN, "Invalid token");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"Error\": \"Authentication is required\"}");
-                return;
+                if (!isPublicUri(uri)) {
+                    log.warn("Invalid JWT: ip={} uri={}", request.getRemoteAddr(), uri);
+                    response.setHeader(HEADER_LOGIN, "Invalid token");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"Error\": \"Authentication is required\"}");
+                    return;
+                }
             }
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var user = userRepository.findByEmail(email);
@@ -111,19 +107,22 @@ public class SecurityJWTFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                     return;
                 }
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setHeader(HEADER_STATUS, "Invalid token");
-                return;
+                if (!isPublicUri(uri)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setHeader(HEADER_STATUS, "Invalid token");
+                    return;
+                }
             }
         }
-        filterChain.doFilter(request, response);
+        if (isPublicUri(uri)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.getWriter().write("{\"Error\": \"Authentication is required\"}");
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith(PREFIX_TOKEN)) {
-            return authorizationHeader.substring(PREFIX_TOKEN.length());
-        }
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

@@ -30,6 +30,10 @@ class SecurityJWTFilterPublicPathsTest {
         assertTrue(SecurityJWTFilter.isPublicUri("/api/v1/chatbot/answers"));
         assertTrue(SecurityJWTFilter.isPublicUri("/v3/api-docs"));
         assertTrue(SecurityJWTFilter.isPublicUri("/actuator/health"));
+        assertTrue(SecurityJWTFilter.isPublicUri("/actuator/health/liveness"));
+        assertTrue(SecurityJWTFilter.isPublicUri("/actuator/health/readiness"));
+        assertTrue(SecurityJWTFilter.isPublicUri("/actuator/prometheus"));
+        assertTrue(SecurityJWTFilter.isPublicUri("/actuator/info"));
         assertTrue(SecurityJWTFilter.isPublicUri("/v3/api-docs/swagger-config"));
     }
 

@@ -2,11 +2,14 @@ package com.ubuntu.ubuntu_app.shared.security;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.ubuntu.ubuntu_app.application.user.UserRole;
 import com.ubuntu.ubuntu_app.infrastructure.user.entity.UserEntity;
@@ -19,6 +22,16 @@ import jakarta.servlet.http.Cookie;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SecurityJWTFilterCookieTest {
+
+    @BeforeEach
+    void setUp() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     private JWTUtils jwtUtilsWithSecret(String secret) {
         return new JWTUtils(new JwtProperties(new JwtProperties.Secret(secret)));
@@ -55,9 +68,8 @@ class SecurityJWTFilterCookieTest {
     }
 
     @Test
-    void bearerHeaderStillWorks() throws Exception {
+    void bearerHeaderWithoutCookieIsForbidden() throws Exception {
         UserRepository repo = Mockito.mock(UserRepository.class);
-        Mockito.when(repo.findByEmail("me@mail.com")).thenReturn(Optional.of(user()));
         var filter = filterWithSecret("0123456789abcdef0123456789abcdef", repo);
         String token = jwtUtilsWithSecret("0123456789abcdef0123456789abcdef").generate(user(), 240);
 
@@ -68,7 +80,8 @@ class SecurityJWTFilterCookieTest {
 
         filter.doFilter(request, response, chain);
 
-        assertNotNull(chain.getRequest());
+        assertEquals(403, response.getStatus());
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test

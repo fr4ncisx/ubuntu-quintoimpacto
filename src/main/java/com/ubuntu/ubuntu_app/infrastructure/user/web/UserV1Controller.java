@@ -14,6 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,11 +36,12 @@ public class UserV1Controller {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
+    public ResponseEntity<ApiResponse<PagedModel<EntityModel<UserResponse>>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<UserResponse> assembler) {
         return ResponseEntity.ok(ApiResponse.ok(
-                userService.findAll(Pages.of(page, size, Sort.by("id")))));
+                assembler.toModel(userService.findAll(Pages.of(page, size, Sort.by("id"))))));
     }
 
     @PutMapping("/{id}")

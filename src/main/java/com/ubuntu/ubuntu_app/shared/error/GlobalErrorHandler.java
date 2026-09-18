@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalErrorHandler {
 
@@ -142,13 +146,6 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IOExtensionException.class)
-    public ResponseEntity<java.util.List<ShowExtensionErrors>> invalidFileExtension(IOExtensionException ex) {
-        var showErrors = ex.getListOfErrors().stream()
-                .map(e -> new ShowExtensionErrors(e.fileName(), e.error(), e.extension())).toList();
-        return new ResponseEntity<>(showErrors, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<Map<String, String>> fileNotFoundToUpload(FileNotFoundException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -165,6 +162,13 @@ public class GlobalErrorHandler {
 
     @ExceptionHandler(CloudinaryFileNotFoundException.class)
     public ResponseEntity<Map<String, String>> cloudinaryFileNotFound(CloudinaryFileNotFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMessage());
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SecurityValidationException.class)
+    public ResponseEntity<Map<String, String>> securityValidationError(SecurityValidationException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMessage());
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
@@ -195,16 +199,21 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<Map<String, String>> notFound(Exception ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Recurso no encontrado");
+        return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> unexpected(Exception ex) {
+        log.error("Unhandled server exception: ", ex);
         Map<String, String> errors = new HashMap<>();
         errors.put("error", "Error interno del servidor");
         return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private record ShowFieldErrors(String field, String message) {
-    }
-
-    private record ShowExtensionErrors(String file, String message, String extension) {
     }
 }

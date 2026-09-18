@@ -83,4 +83,30 @@ class UserServiceUpdateAuthorizationTest {
         assertThrows(AccessDeniedException.class,
                 () -> userService.update(updateDto(), "victim@mail.com"));
     }
+
+    @Test
+    void adminCanDeactivateUser() {
+        var victim = user("victim@mail.com", UserRole.USER);
+        authenticateAs(user("admin@mail.com", UserRole.ADMIN));
+        Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(victim));
+
+        assertDoesNotThrow(() -> userService.deactivate(2L));
+        assertFalse(victim.isActive());
+        Mockito.verify(userRepository).save(victim);
+    }
+
+    @Test
+    void userCannotDeactivateUser() {
+        authenticateAs(user("user@mail.com", UserRole.USER));
+
+        assertThrows(AccessDeniedException.class,
+                () -> userService.deactivate(1L));
+        Mockito.verify(userRepository, Mockito.never()).findById(Mockito.anyLong());
+    }
+
+    @Test
+    void unauthenticatedDeactivateIsDenied() {
+        assertThrows(AccessDeniedException.class,
+                () -> userService.deactivate(1L));
+    }
 }
